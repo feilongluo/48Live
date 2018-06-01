@@ -1,0 +1,33 @@
+// Variables
+@import "variables";
+
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+#app{
+  width: 100%;
+  height: 600px;
+}
+
+.vjs-big-play-button {
+  display: none !important;
+}
+
+.vjs-error-display,.vjs-modal-dialog{
+  display: none;
+}
+
+div[id^="vjs_video_"]{
+  max-height: 680px;
+}
+
+.layout {
+  border: 1px solid #d7dde4;
+  background: #f5f7f9;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
