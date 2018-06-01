@@ -1,6 +1,7 @@
 # 48Live
 
 ## 项目参考 [pocket48-grab](https://github.com/xsaiting/pocket48-grab/)
+  接口以及成员信息都从这里来的
 
 ## 基于Laravel + Vue
 
@@ -8,8 +9,11 @@
 
 ```bash
 composer update
-```
-
-```bash
 npm install
 ```
+
+
+## 用到的一些开源项目
+*  [vue-video-player](https://github.com/surmon-china/vue-video-player)
+*  [flv.js](https://github.com/Bilibili/flv.js)
+*  [iview](https://github.com/iview/iview)
