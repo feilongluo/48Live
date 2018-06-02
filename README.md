@@ -12,13 +12,14 @@
 ```bash
 composer update
 npm install
+npm run dev
 ```
 
 
 ## 用到的一些开源项目
-*  [vue-video-player](https://github.com/surmon-china/vue-video-player)
-*  [flv.js](https://github.com/Bilibili/flv.js)
-*  [iview](https://github.com/iview/iview)
+* ### [vue-video-player](https://github.com/surmon-china/vue-video-player)
+* ### [flv.js](https://github.com/Bilibili/flv.js)
+* ### [iview](https://github.com/iview/iview)
 
 ## 最后
 # 超绝可爱黄婷婷
