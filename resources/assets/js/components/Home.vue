@@ -67,7 +67,7 @@
                     </div>
                 </Card>
             </Content>
-            <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer>
+            <Footer class="layout-footer-center">2018 &copy; 超绝可爱黄婷婷</Footer>
         </Layout>
     </div>
 </template>

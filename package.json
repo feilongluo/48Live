@@ -20,7 +20,6 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
-        "chimee-player": "^1.4.3",
         "flv.js": "^1.4.2",
         "iview": "^2.14.0-rc.3",
         "videojs-contrib-hls": "^5.14.1",

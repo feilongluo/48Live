@@ -10,23 +10,13 @@
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">{{title}}</p>
 
-                        <video class="video" id="liveVideo"></video>
+                        <video class="video" id="liveVideo" ref="video"></video>
 
-                        <div class="button-box">
-                            <Icon class="button" @click="play" type="play" v-if="!isPlaying"></Icon>
-
-                            <Icon class="button" @click="pause" type="pause" v-if="isPlaying"></Icon>
-
-                            <div class="volume-box">
-                                <Icon style="margin-right:8px;" class="button" type="volume-high" @click="mute"
-                                        v-if="!isMuted"></Icon>
-
-                                <Icon style="margin-right:8px;" class="button" type="volume-mute" @click="cancelMute"
-                                        v-if="isMuted"></Icon>
-
-                                <Slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"></Slider>
-                            </div>
-                        </div>
+                        <player-controls :volume="volume" :is-muted="isMuted" :show-progress="isReview"
+                                :is-playing="isPlaying" :volume-disabled="volumeDisabled"
+                                @play="play" @pause="pause" @mute="mute" @progress="progressChange"
+                                :current-time="currentTime"
+                                :duration="duration"></player-controls>
                     </Card>
                 </div>
             </Content>
@@ -36,12 +26,14 @@
 
 <script>
     import PlayerHeader from "./PlayerHeader";
+    import PlayerControls from "./PlayerControls";
+
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
 
     export default {
         name:'FlvJs',
-        components:{PlayerHeader},
+        components:{PlayerControls, PlayerHeader},
         data(){
             return {
                 spinShow:true,
@@ -54,6 +46,9 @@
                 volume:80,
                 isMuted:false,
                 volumeDisabled:false,
+                duration:0,
+                currentTime:0,
+                isReview:true,      //是否回放
             }
         },
         computed:{
@@ -94,8 +89,22 @@
                         type:this.getType(this.streamPath),
                         url:this.streamPath
                     });
-                    this.flvPlayer.on(this.$flvjs.Events.ERROR, error =>{
-                        console.log(error);
+
+                    //时长
+                    this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                        this.duration = media.duration / 1000;
+                    });
+                    //当前进度
+                    this.$refs.video.addEventListener('timeupdate', event =>{
+                        this.currentTime = event.target.currentTime;
+                    });
+                    //播放结束
+                    this.$refs.video.addEventListener('ended', event =>{
+                        this.status = STATUS_PREPARED;
+                        this.$Notice.info({
+                           title:'播放完毕',
+                           desc:''
+                        });
                     });
 
                     this.flvPlayer.attachMediaElement(videoElement);
@@ -134,6 +143,9 @@
                 }else if(url.includes('.flv')){
                     return 'flv';
                 }
+            },
+            progressChange:function(progress){
+                this.flvPlayer.currentTime = progress;
             }
         }
     }
@@ -149,26 +161,5 @@
         min-height: 400px;
         min-width: 320px;
         max-height: 720px;
-    }
-
-    .button-box {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 8px;
-    }
-
-    .button {
-        cursor: pointer;
-        font-size: 32px;
-    }
-
-    .volume-box {
-        display: flex;
-        flex: 1 0 auto;
-        justify-content: flex-end;
-    }
-
-    .volume-slider {
-        width: 30%;
     }
 </style>

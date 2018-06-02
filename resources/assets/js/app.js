@@ -21,9 +21,6 @@ require('vue-video-player/src/custom-theme.css');
 import 'videojs-contrib-hls';
 import 'videojs-flash';
 
-import ChimeePlayer from 'chimee-player';
-window.ChimeePlayer = ChimeePlayer;
-
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

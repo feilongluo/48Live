@@ -7,7 +7,7 @@
 
     <title>口袋48成员直播</title>
 
-    <link rel="stylesheet" href="{{asset('css/app.css')}}">
+    <link rel="stylesheet" href="{{asset('css/app.css')}}?v={{str_random()}}">
 </head>
 <body>
 <div id="app">

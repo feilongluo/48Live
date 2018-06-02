@@ -1,7 +1,6 @@
 import Home from './components/Home';
 import FlvJs from './components/FlvJs';
 import VideoJs from './components/VideoJs';
-import Mp4 from './components/Mp4';
 
 const routes = [
     {
@@ -20,12 +19,6 @@ const routes = [
         path:'/videojs/:liveId',
         components:{
             default:VideoJs
-        }
-    },
-    {
-        path:'/mp4',
-        components:{
-            default:Mp4
         }
     }
 ];
