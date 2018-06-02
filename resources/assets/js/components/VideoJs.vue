@@ -14,7 +14,8 @@
 
                         <player-controls :volume="volume" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
-                                @play="play" @pause="pause" @mute="mute" @progress="progressChange"
+                                @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
+                                @volume="onVolumeChange"
                                 :current-time="currentTime"
                                 :duration="duration"></player-controls>
                     </Card>
@@ -131,7 +132,7 @@
                 this.isMuted = true;
                 this.volumeDisabled = true;
             },
-            cancelMute:function(){
+            unmute:function(){
                 this.player.volume(this.volume * 0.01);
                 this.isMuted = false;
                 this.volumeDisabled = false;

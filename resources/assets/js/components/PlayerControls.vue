@@ -15,10 +15,11 @@
                 <Icon style="margin-right:8px;" class="volume-icon" type="volume-high" @click="mute"
                         v-if="!isMuted"></Icon>
 
-                <Icon style="margin-right:8px;" class="volume-icon" type="volume-mute" @click="cancelMute"
+                <Icon style="margin-right:8px;" class="volume-icon" type="volume-mute" @click="unmute"
                         v-if="isMuted"></Icon>
 
-                <Slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"></Slider>
+                <Slider class="volume-slider" :disabled="volumeDisabled" v-model="volume"
+                        @on-change="volumeChange"></Slider>
             </div>
         </div>
     </div>
@@ -31,6 +32,7 @@
             return {
                 progress:0,
                 dragging:false,
+                volume:80
             }
         },
         props:{
@@ -44,10 +46,6 @@
             },
             volumeDisabled:{
                 type:Boolean,
-                required:true
-            },
-            volume:{
-                type:Number,
                 required:true
             },
             showProgress:{
@@ -91,8 +89,8 @@
             mute:function(){
                 this.$emit('mute')
             },
-            cancelMute:function(){
-                this.$emit('cancelMute')
+            unmute:function(){
+                this.$emit('unmute')
             },
             progressChange:function(progress){
                 this.$emit('progress', progress);
@@ -100,6 +98,9 @@
             },
             progressInput:function(){
                 this.dragging = true;
+            },
+            volumeChange:function(volume){
+                this.$emit('volume', volume);
             }
         }
     }
