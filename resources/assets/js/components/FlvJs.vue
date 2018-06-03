@@ -130,9 +130,13 @@
                             desc:''
                         });
                     });
-
-                    this.getBarrages();
                     this.flvPlayer.load();
+
+                    if(this.isReview){
+                        this.getBarrages();
+                    }else{
+                        this.spinShow = false;
+                    }
                 }
             },
             getBarrages:function(){

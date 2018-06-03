@@ -112,7 +112,12 @@
                         //时长
                         this.player.on('loadeddata', event =>{
                             this.duration = event.target.player.duration();
-                            this.getBarrages();
+
+                            if(this.isReview){
+                                this.getBarrages();
+                            }else{
+                                this.spinShow = false;
+                            }
                         });
                         //当前进度
                         this.player.on('timeupdate', event =>{
