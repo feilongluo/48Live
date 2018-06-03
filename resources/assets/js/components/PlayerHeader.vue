@@ -1,25 +1,48 @@
 <template>
-    <Header>
-        <Menu mode="horizontal" theme="dark" active-name="1">
-            <router-link to="/" class="layout-logo">
-                <Icon class="home-icon" type="home"></Icon>
-            </router-link>
-            <div class="layout-nav">
-                <router-link :to="url">
-                    <Button type="primary">不能播放，切换播放器</Button>
+    <div>
+        <Header>
+            <div class="header-box">
+                <router-link to="/" class="layout-logo">
+                    <Icon class="home-icon" type="home"></Icon>
                 </router-link>
+                <div class="layout-nav">
+                    <Button type="primary" @click="nextPlayer">不能播放，切换播放器</Button>
+
+                    <Button style="margin-left: 8px;" type="primary" @click="showUrl = true">视频地址</Button>
+                </div>
             </div>
-        </Menu>
-    </Header>
+        </Header>
+
+        <Modal v-model="showUrl"
+                title="视频地址">
+            <p>{{videoUrl}}</p>
+        </Modal>
+    </div>
 </template>
 
 <script>
     export default {
         name:'PlayerHeader',
+        data(){
+            return {
+                showUrl:false
+            }
+        },
         props:{
-            url:{
+            otherPlayer:{
                 type:String,
                 required:true
+            },
+            videoUrl:{
+                type:String,
+                require:true
+            }
+        },
+        methods:{
+            nextPlayer:function(){
+                this.$router.push({
+                    path:this.otherPlayer
+                })
             }
         }
     }
@@ -30,9 +53,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: flex-end;
-        float: right;
         width: 480px;
-        margin: 0 auto;
     }
 
     .layout-logo {
@@ -41,11 +62,14 @@
         align-items: center;
         padding: 4px 8px;
         background: #5b6270;
-        float: left;
-        position: relative;
-        top: 15px;
-        left: 20px;
         border-radius: 4px;
+    }
+
+    .header-box{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
     }
 
     .home-icon {

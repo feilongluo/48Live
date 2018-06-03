@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
         <Layout>
-            <player-header :url="'/videojs/' + liveId"></player-header>
+            <player-header :other-player="'/videojs/' + liveId" :video-url="streamPath"></player-header>
             <Content style="padding: 16px 32px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
@@ -136,10 +136,6 @@
                 this.volumeDisabled = false;
             },
             getType:function(url){
-                this.$Notice.info({
-                    title:'当前视频地址：',
-                    desc:url
-                });
                 if(url.includes('.mp4')){
                     return 'mp4';
                 }else if(url.includes('.flv')){
