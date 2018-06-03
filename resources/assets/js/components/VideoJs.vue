@@ -12,12 +12,17 @@
 
                         <video-player ref="videoPlayer" class="video" :options="playerOptions"></video-player>
 
-                        <player-controls ref="volume" :is-muted="isMuted" :show-progress="isReview"
+                        <player-controls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="onVolumeChange"
                                 :current-time="currentTime"
                                 :duration="duration"></player-controls>
+                    </Card>
+
+                    <Card style="flex: 1 0 auto;margin-left: 16px;">
+                        <p slot="title">弹幕</p>
+                        <div class="barrage-container" ref="barrage"></div>
                     </Card>
                 </div>
             </Content>
@@ -53,6 +58,7 @@
                 spinShow:true,
                 liveId:'',
                 streamPath:'',
+                barrageUrl:'',
                 title:'',
                 subTitle:'',
                 status:STATUS_PREPARED,
@@ -62,6 +68,9 @@
                 duration:0,
                 currentTime:0,
                 isReview:true,      //是否回放
+                currentBarrage:{},
+                finalBarrageList:[],
+                barrageList:[],
             }
         },
         computed:{
@@ -81,6 +90,9 @@
             this.liveId = this.$route.params.liveId;
             this.getOne();
         },
+        mounted:function(){
+            this.send = this.$start(this.$refs.barrage);
+        },
         methods:{
             getOne:function(){
                 axios.get('/api/live/' + this.liveId).then(res =>{
@@ -89,6 +101,7 @@
                         this.title = res.data.data.title;
                         this.subTitle = res.data.data.subTitle;
                         this.isReview = res.data.data.isReview;
+                        this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
 
                         this.player.volume(this.$refs.controls.volume * 0.01);
 
@@ -99,11 +112,20 @@
                         //时长
                         this.player.on('loadeddata', event =>{
                             this.duration = event.target.player.duration();
-                            this.spinShow = false;
+                            this.getBarrages();
                         });
                         //当前进度
                         this.player.on('timeupdate', event =>{
                             this.currentTime = event.target.player.currentTime();
+                            //弹幕
+                            if(this.inRange(this.timeToSecond(this.currentBarrage.time), this.currentTime)){
+                                this.currentBarrage = this.barrageList.shift();
+                                this.send({
+                                    text:this.currentBarrage.content,
+                                    speed:3,
+                                    classname:'style1'
+                                });
+                            }
                         });
                         //播放结束
                         this.player.on('ended', () =>{
@@ -118,6 +140,24 @@
                     }
                 }).catch(error =>{
                     this.spinShow = false;
+                    console.log(error);
+                });
+            },
+            getBarrages:function(){
+                axios.get('/api/barrage', {
+                    params:{
+                        barrageUrl:this.barrageUrl
+                    }
+                }).then(res =>{
+                    if(res.data.errorCode == 0){
+                        this.finalBarrageList = this.barrageList = res.data.data.barrages;
+                        this.currentBarrage = this.barrageList.shift();
+
+                        this.spinShow = false;
+                    }else{
+                        this.$Message.error(res.data.msg);
+                    }
+                }).catch(error =>{
                     this.$Message.error(error);
                 });
             },
@@ -151,6 +191,24 @@
             },
             progressChange:function(progress){
                 this.player.currentTime(progress);
+                //重新加载弹幕
+                this.barrageList = [];
+                this.finalBarrageList.forEach(item =>{
+                    if(this.timeToSecond(item.time) - 2 > progress){
+                        this.barrageList.push(item);
+                    }
+                });
+                this.currentBarrage = this.barrageList.shift();
+            },
+            timeToSecond:function(time){
+                const hours = time.split(':')[0];
+                const minutes = time.split(':')[1];
+                const seconds = time.split(':')[2];
+                return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+            },
+            inRange(barrageTime, videoTime){  //弹幕误差2秒
+                console.log(barrageTime + ' , ' + videoTime);
+                return barrageTime > videoTime - 2 && barrageTime < videoTime + 2;
             }
         }
     }
@@ -159,7 +217,12 @@
 <style scoped>
     .player-container {
         display: flex;
-        justify-content: center;
+    }
+
+    .barrage-container {
+        flex: 1 0 auto;
+        width: 100%;
+        height: 640px;
     }
 
     .video {

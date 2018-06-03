@@ -21,6 +21,8 @@ require('vue-video-player/src/custom-theme.css');
 import 'videojs-contrib-hls';
 import 'videojs-flash';
 
+import Barrage from "vue2-barrage";
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -32,6 +34,7 @@ import 'videojs-flash';
 Vue.use(VueRouter);
 Vue.use(iView);
 Vue.use(VueVideoPlayer);
+Vue.use(Barrage);
 Vue.prototype.$flvjs = flvjs;
 
 const router = new VueRouter({

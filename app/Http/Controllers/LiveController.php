@@ -59,6 +59,34 @@ class LiveController extends Controller{
 		return $this->success($data);
 	}
 
+	public function barrage(){
+		$url = $this->request->barrageUrl;
+		if(!$url){
+			return $this->failed('url不能为空');
+		}
+		$content = file_get_contents($url);
+
+		$array = explode("\r\n", $content);
+		$barrages = [];
+		foreach($array as $item){
+			$arr = explode(']', $item);
+			if(!is_array($arr) || empty($arr) || count($arr) < 2){
+				continue;
+			}
+			$time = str_replace('[', '', $arr[0]);
+			$arr = explode("\t", $arr[1]);
+			$barrages[] = [
+				'time' => $time,
+				'username' => $arr[0],
+				'content' => $arr[1]
+			];
+		}
+
+		return $this->success([
+			'barrages' => $barrages
+		]);
+	}
+
 	/**
 	 * @param $url
 	 * @param $body

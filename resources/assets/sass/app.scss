@@ -20,7 +20,7 @@
 }
 
 div[id^="vjs_video_"] {
-  max-height: 680px;
+  max-height: 640px;
 }
 
 .layout {
@@ -29,4 +29,8 @@ div[id^="vjs_video_"] {
   position: relative;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.barrage{
+  font-size:24px !important;
 }

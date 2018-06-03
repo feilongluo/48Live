@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,3 +18,5 @@ use Illuminate\Http\Request;
 Route::get('/live', 'LiveController@list');
 
 Route::get('/live/{liveId}', 'LiveController@show');
+
+Route::get('/barrage', 'LiveController@barrage');
