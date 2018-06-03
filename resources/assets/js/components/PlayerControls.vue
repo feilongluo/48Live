@@ -1,8 +1,9 @@
 <template>
     <div>
-        <div class="progress-container" v-if="showProgress">
+        <div class="progress-container" v-if="showProgress"
+                @mousedown="dragging = true" @mouseup="dragging = false">
             <Slider :max="duration" class="progress-slider" v-model="progress"
-                    @on-change="progressChange" @on-input="progressInput" :tip-format="timeFormat"></Slider>
+                    @on-change="progressChange" :tip-format="timeFormat"></Slider>
             <span class="progress-text">{{timeFormat(currentTime)}} / {{timeFormat(duration)}}</span>
         </div>
 
@@ -68,6 +69,11 @@
                 }
             }
         },
+        created:function(){
+            if(localStorage.getItem('volume') != null){
+                this.volume = parseInt(localStorage.getItem('volume'));
+            }
+        },
         methods:{
             timeFormat:function(seconds){
                 seconds = Math.round(seconds);
@@ -94,14 +100,11 @@
             },
             progressChange:function(progress){
                 this.$emit('progress', progress);
-                this.dragging = false;
-            },
-            progressInput:function(){
-                this.dragging = true;
             },
             volumeChange:function(volume){
+                localStorage.setItem('volume', volume);
                 this.$emit('volume', volume);
-            }
+            },
         }
     }
 </script>

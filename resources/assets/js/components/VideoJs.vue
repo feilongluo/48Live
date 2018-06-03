@@ -12,7 +12,7 @@
 
                         <video-player ref="videoPlayer" class="video" :options="playerOptions"></video-player>
 
-                        <player-controls :volume="volume" :is-muted="isMuted" :show-progress="isReview"
+                        <player-controls ref="volume" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="onVolumeChange"
@@ -56,7 +56,7 @@
                 title:'',
                 subTitle:'',
                 status:STATUS_PREPARED,
-                volume:80,
+                volume:0,
                 isMuted:false,
                 volumeDisabled:false,
                 duration:0,
@@ -89,6 +89,8 @@
                         this.title = res.data.data.title;
                         this.subTitle = res.data.data.subTitle;
                         this.isReview = res.data.data.isReview;
+
+                        this.player.volume(this.$refs.controls.volume * 0.01);
 
                         this.player.src({
                             type:this.getType(this.streamPath),

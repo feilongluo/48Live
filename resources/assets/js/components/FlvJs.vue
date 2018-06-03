@@ -12,7 +12,7 @@
 
                         <video class="video" id="liveVideo" ref="video"></video>
 
-                        <player-controls :volume="volume" :is-muted="isMuted" :show-progress="isReview"
+                        <player-controls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="volumeChange"
@@ -44,12 +44,12 @@
                 title:'',
                 subTitle:'',
                 status:STATUS_PREPARED,
-                volume:80,
                 isMuted:false,
                 volumeDisabled:false,
                 duration:0,
                 currentTime:0,
                 isReview:true,      //是否回放
+                volume:0,
             }
         },
         computed:{
@@ -73,6 +73,7 @@
                         this.streamPath = res.data.data.streamPath;
                         this.title = res.data.data.title;
                         this.subTitle = res.data.data.subTitle;
+                        this.isReview = res.data.data.isReview;
 
                         this.init();
                     }else{
@@ -111,7 +112,7 @@
                     this.flvPlayer.attachMediaElement(videoElement);
                     this.flvPlayer.load();
                     this.spinShow = false;
-                    this.flvPlayer.volume = this.volume * 0.01;
+                    this.flvPlayer.volume = this.$refs.controls.volume * 0.01;
 
                     this.play();
                 }
@@ -150,6 +151,7 @@
             },
             volumeChange:function(volume){
                 this.volume = volume;
+
             }
         }
     }

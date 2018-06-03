@@ -31,7 +31,15 @@
 
                                                 <img ref="cover" class="cover" :src="cover(item.cover)">
                                                 <p style="color:#ccc;">{{item.date}}</p>
-                                                <p>{{item.member.name}}</p>
+                                                <div style="display: flex;justify-content: space-between;">
+                                                    <div>
+                                                        <span style="color: #000;">{{item.member.name}}</span>
+                                                        <span class="team-badge"
+                                                                :style="{'background-color':item.member.team.color}">{{item.member.team.name}}</span>
+                                                    </div>
+                                                    <span v-if="item.liveType == 1">直播</span>
+                                                    <span v-else>电台</span>
+                                                </div>
                                             </Card>
                                         </router-link>
                                     </Col>
@@ -51,11 +59,15 @@
 
                                                 <img ref="cover" class="cover" :src="cover(item.cover)">
                                                 <p style="color:#ccc;">{{item.date}}</p>
-                                                <p>
-                                                    <span style="color: #000;">{{item.member.name}}</span>
-                                                    <span class="team-badge"
-                                                            :style="{'background-color':item.member.team.color}">{{item.member.team.name}}</span>
-                                                </p>
+                                                <div style="display: flex;justify-content: space-between;">
+                                                    <div>
+                                                        <span style="color: #000;">{{item.member.name}}</span>
+                                                        <span class="team-badge"
+                                                                :style="{'background-color':item.member.team.color}">{{item.member.team.name}}</span>
+                                                    </div>
+                                                    <span v-if="item.liveType == 1">直播</span>
+                                                    <span v-else>电台</span>
+                                                </div>
                                             </Card>
                                         </router-link>
                                     </Col>
