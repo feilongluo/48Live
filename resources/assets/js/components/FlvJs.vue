@@ -113,14 +113,7 @@
                     this.$refs.video.addEventListener('timeupdate', event =>{
                         this.currentTime = event.target.currentTime;
                         //弹幕
-                        if(this.inRange(this.timeToSecond(this.currentBarrage.time), this.currentTime)){
-                            this.currentBarrage = this.barrageList.shift();
-                            this.send({
-                                text:this.currentBarrage.content,
-                                speed:3,
-                                classname:'style1'
-                            });
-                        }
+                        this.loadBarrages(this.currentTime);
                     });
                     //播放结束
                     this.$refs.video.addEventListener('ended', event =>{
@@ -130,7 +123,6 @@
                             desc:''
                         });
                     });
-                    this.flvPlayer.load();
 
                     if(this.isReview){
                         this.getBarrages();
@@ -152,13 +144,15 @@
                         this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
                             this.duration = media.duration / 1000;
                         });
+                        this.flvPlayer.load();
 
                         this.spinShow = false;
                     }else{
                         this.$Message.error(res.data.msg);
                     }
                 }).catch(error =>{
-                    this.$Message.error(error);
+                    this.$Message.error('弹幕加载失败');
+                    console.log(error);
                 });
             },
             play:function(){
@@ -191,9 +185,9 @@
                 //重新加载弹幕
                 this.barrageList = [];
                 this.finalBarrageList.forEach(item =>{
-                   if(this.timeToSecond(item.time) - 2 > progress){
-                       this.barrageList.push(item);
-                   }
+                    if(this.timeToSecond(item.time) - 2 > progress){
+                        this.barrageList.push(item);
+                    }
                 });
                 this.currentBarrage = this.barrageList.shift();
             },
@@ -206,10 +200,18 @@
                 const seconds = time.split(':')[2];
                 return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
             },
-            inRange(barrageTime, videoTime){  //弹幕误差2秒
-                console.log(barrageTime + ' , ' + videoTime);
-                return barrageTime > videoTime - 2 && barrageTime < videoTime + 2;
-            }
+            loadBarrages:function(){
+                const barrageTime = this.timeToSecond(this.currentBarrage.time);
+                if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
+                    this.send({
+                        text:this.currentBarrage.content,
+                        speed:3,
+                        classname:'style1'
+                    });
+                    this.currentBarrage = this.barrageList.shift();
+                    this.loadBarrages(this.currentTime);
+                }
+            },
         }
     }
 </script>

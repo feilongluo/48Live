@@ -123,14 +123,7 @@
                         this.player.on('timeupdate', event =>{
                             this.currentTime = event.target.player.currentTime();
                             //弹幕
-                            if(this.inRange(this.timeToSecond(this.currentBarrage.time), this.currentTime)){
-                                this.currentBarrage = this.barrageList.shift();
-                                this.send({
-                                    text:this.currentBarrage.content,
-                                    speed:3,
-                                    classname:'style1'
-                                });
-                            }
+                            this.loadBarrages();
                         });
                         //播放结束
                         this.player.on('ended', () =>{
@@ -163,7 +156,8 @@
                         this.$Message.error(res.data.msg);
                     }
                 }).catch(error =>{
-                    this.$Message.error(error);
+                    this.$Message.error('弹幕加载失败');
+                    console.log(error);
                 });
             },
             play:function(){
@@ -211,10 +205,18 @@
                 const seconds = time.split(':')[2];
                 return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
             },
-            inRange(barrageTime, videoTime){  //弹幕误差2秒
-                console.log(barrageTime + ' , ' + videoTime);
-                return barrageTime > videoTime - 2 && barrageTime < videoTime + 2;
-            }
+            loadBarrages:function(){
+                const barrageTime = this.timeToSecond(this.currentBarrage.time);
+                if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
+                    this.send({
+                        text:this.currentBarrage.content,
+                        speed:3,
+                        classname:'style1'
+                    });
+                    this.currentBarrage = this.barrageList.shift();
+                    this.loadBarrages();
+                }
+            },
         }
     }
 </script>

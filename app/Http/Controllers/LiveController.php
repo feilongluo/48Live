@@ -101,9 +101,11 @@ class LiveController extends Controller{
 			if($body['status'] == 200){
 				return $body;
 			}else{
+				\Log::debug($body['message']);
 				return false;
 			}
 		}catch(GuzzleException $e){
+			\Log::debug($e->getMessage());
 			return false;
 		}
 	}
