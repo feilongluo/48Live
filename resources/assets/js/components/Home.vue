@@ -179,7 +179,7 @@
                 });
             },
             onPageChange:function(page){
-                const start = (page - 1) * 12;
+                const start = (page - 1) * this.pageSize;
                 this.currentLiveList = this.liveList.slice(start, start + this.pageSize);
                 this.currentReviewList = this.reviewList.slice(start, start + this.pageSize);
             },
