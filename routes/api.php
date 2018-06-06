@@ -20,3 +20,5 @@ Route::get('/live', 'LiveController@list');
 Route::get('/live/{liveId}', 'LiveController@show');
 
 Route::get('/barrage', 'LiveController@barrage');
+
+Route::get('/token', 'LiveController@token');

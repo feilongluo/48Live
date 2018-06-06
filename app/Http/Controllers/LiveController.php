@@ -18,6 +18,8 @@ class LiveController extends Controller{
 	const URL_MEMBER_LIVE_PAGE = 'https://plive.48.cn/livesystem/api/live/v1/memberLivePage';
 	const URL_MEMBER_LIVE_SHOW = 'https://plive.48.cn/livesystem/api/live/v1/getLiveOne';
 
+	const URL_CHATROOM_TOKEN = 'http://zhibo.ckg48.com/Server/do_ajax_setcookie';
+
 	public function list(){
 		$body = [
 			'lastTime' => '0',
@@ -86,6 +88,48 @@ class LiveController extends Controller{
 			'barrages' => $barrages
 		]);
 	}
+
+	public function token(){
+		$body = [
+			'timestamp' => time(),
+			'cookie_val' => $this->randomString(8),
+			'type' => 2
+		];
+
+		$client = new Client();
+
+		try{
+			//我也不知道为毛要请求两次才行
+			$client->request(self::METHOD_POST, self::URL_CHATROOM_TOKEN, [
+				'form_params' => $body
+			]);
+			$response = $client->request(self::METHOD_POST, self::URL_CHATROOM_TOKEN, [
+				'form_params' => $body
+			]);
+			$body = json_decode($response->getBody(), true);
+			return $this->success([
+				'account' => $body['account'],
+				'token' => $body['token']
+			]);
+		}catch(GuzzleException $e){
+			return $this->failed('token获取失败');
+		}
+	}
+
+	/**
+	 * 生成随机cookie_val，用于未登录获取token
+	 * @param int $length
+	 * @return string
+	 */
+	private function randomString($length = 32){
+		$chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz012345678_@';
+		$password = '';
+		for($i = 0; $i < $length; $i++){
+			$password .= substr($chars, random_int(0, strlen($chars) - 1), 1);
+		}
+		return '48web' . $password;
+	}
+
 
 	/**
 	 * @param $url

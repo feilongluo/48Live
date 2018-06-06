@@ -32,9 +32,9 @@
 </template>
 
 <script>
-    import PlayerHeader from "./PlayerHeader";
-    import PlayerControls from "./PlayerControls";
-
+    import PlayerHeader from './PlayerHeader';
+    import PlayerControls from './PlayerControls';
+    import ChatRoom from '../48chatroom';
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -61,6 +61,7 @@
                 currentBarrage:{},
                 finalBarrageList:[],
                 barrageList:[],
+                roomId:''
             }
         },
         computed:{
@@ -89,6 +90,7 @@
                         this.subTitle = res.data.data.subTitle;
                         this.isReview = res.data.data.isReview;
                         this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
+                        this.roomId = res.data.data.roomId;
 
                         this.init();
                     }else{
@@ -113,10 +115,13 @@
                     this.$refs.video.addEventListener('timeupdate', event =>{
                         this.currentTime = event.target.currentTime;
                         //弹幕
-                        this.loadBarrages(this.currentTime);
+                        if(this.isReview){  //录播
+                            this.loadBarrages();
+                        }
+
                     });
                     //播放结束
-                    this.$refs.video.addEventListener('ended', event =>{
+                    this.$refs.video.addEventListener('ended', () =>{
                         this.status = STATUS_PREPARED;
                         this.$Notice.info({
                             title:'播放完毕',
@@ -124,10 +129,10 @@
                         });
                     });
 
-                    if(this.isReview){
+                    if(this.isReview){  //录播
                         this.getBarrages();
-                    }else{
-                        this.spinShow = false;
+                    }else{              //直播
+                        this.connectChatRoom();
                     }
                 }
             },
@@ -209,9 +214,66 @@
                         classname:'style1'
                     });
                     this.currentBarrage = this.barrageList.shift();
-                    this.loadBarrages(this.currentTime);
+                    setTimeout(() =>{
+                        this.loadBarrages();
+                    }, 20);
                 }
             },
+            //连接聊天室
+            connectChatRoom:function(){
+                this.chatRoom = new ChatRoom({
+                    roomId:this.roomId,
+                    onConnect:() =>{
+                        this.$Notice.success({
+                            title:'聊天室连接成功',
+                            desc:''
+                        });
+                        this.chatRoom.close();
+                    },
+                    onDisconnect:(message) =>{
+                        this.$Notice.success({
+                            title:'聊天室连接断开',
+                            desc:''
+                        });
+                        console.log(message);
+                    },
+                    onWillConnect:() =>{
+
+                    },
+                    /**
+                     * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
+                     */
+                    onMessage:messages =>{
+                        messages.forEach(message =>{
+                            if(message.type == 'text'){
+                                const custom = JSON.parse(message.custom);
+                                if(custom.contentType == 1){
+                                    this.send({
+                                        text:custom.content,
+                                        speed:3,
+                                        classname:'style1'
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    onError:error =>{
+                        console.log(error);
+                    },
+                    onTokenFailed:error =>{
+                        this.$Notice.success({
+                            title:'聊天室token获取失败',
+                            desc:''
+                        });
+                        console.log(error);
+                    },
+                    onTokenSuccess:() =>{
+                        this.flvPlayer.load();
+                        this.spinShow = false;
+                        this.play();
+                    }
+                });
+            }
         }
     }
 </script>

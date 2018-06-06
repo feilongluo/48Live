@@ -2,9 +2,6 @@
     <div>
         <Header>
             <div class="header-box">
-                <router-link to="/" class="layout-logo">
-                    <Icon class="home-icon" type="home"></Icon>
-                </router-link>
                 <div class="layout-nav">
                     <Button type="primary" @click="nextPlayer">不能播放，切换播放器</Button>
 
@@ -15,7 +12,9 @@
 
         <Modal v-model="showUrl"
                 title="视频地址">
-            <p>{{videoUrl}}</p>
+            <p>
+                <span>{{videoUrl}}</span>
+            </p>
         </Modal>
     </div>
 </template>
@@ -43,6 +42,9 @@
                 this.$router.push({
                     path:this.otherPlayer
                 })
+            },
+            copy:function(){
+                window.clipboardData.setData("Text", this.videoUrl);
             }
         }
     }
@@ -60,15 +62,15 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        padding: 4px 8px;
+        padding: 4px 16px;
         background: #5b6270;
         border-radius: 4px;
     }
 
-    .header-box{
+    .header-box {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
         height: 100%;
     }
 

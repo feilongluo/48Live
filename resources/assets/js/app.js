@@ -21,8 +21,7 @@ require('vue-video-player/src/custom-theme.css');
 import 'videojs-contrib-hls';
 import 'videojs-flash';
 
-import Barrage from "vue2-barrage";
-
+import Barrage from 'vue2-barrage';
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

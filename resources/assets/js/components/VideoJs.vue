@@ -115,8 +115,6 @@
 
                             if(this.isReview){
                                 this.getBarrages();
-                            }else{
-                                this.spinShow = false;
                             }
                         });
                         //当前进度
@@ -133,6 +131,7 @@
                                 desc:''
                             });
                         });
+                        this.spinShow = false;
                     }else{
                         this.$Message.error(res.data.msg);
                     }
@@ -150,8 +149,6 @@
                     if(res.data.errorCode == 0){
                         this.finalBarrageList = this.barrageList = res.data.data.barrages;
                         this.currentBarrage = this.barrageList.shift();
-
-                        this.spinShow = false;
                     }else{
                         this.$Message.error(res.data.msg);
                     }

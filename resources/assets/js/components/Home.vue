@@ -6,9 +6,11 @@
             <Header>
                 <Cascader class="cascader" placeholder="请选择成员" :data="members" v-model="selectedMember"></Cascader>
 
-                <span style="margin-left:16px;color:white;">获取直播条数</span>
-                <InputNumber style="margin-left:8px;" :max="1600" :min="1" v-model="limit"></InputNumber>
+                <span style="margin-left:16px;color:white;">获取条数</span>
 
+                <Tooltip content="最大值：4800" placement="bottom">
+                    <InputNumber style="margin-left:8px;" :max="4800" :min="1" :step="160" v-model="limit"></InputNumber>
+                </Tooltip>
 
                 <Button type="primary" @click="getList">搜索</Button>
             </Header>
@@ -25,7 +27,8 @@
                                         :key="index">
                                     <Col style="padding: 4px;" span="3" v-for="(item, i) in currentLiveList"
                                             v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
-                                        <router-link :to="getUrl(item)">
+                                        <!--没找到48聊天室断开websocket的api，所以出现这种情况-->
+                                        <a :href="getUrl(item)" target="_blank">
                                             <Card>
                                                 <p slot="title">{{item.subTitle}}</p>
 
@@ -41,7 +44,7 @@
                                                     <span v-else>电台</span>
                                                 </div>
                                             </Card>
-                                        </router-link>
+                                        </a>
                                     </Col>
                                 </Row>
                                 <Page :total="liveTotal" :page-size="pageSize" size="small" show-total
@@ -53,7 +56,7 @@
                                         :key="index">
                                     <Col style="padding: 4px;" span="3" v-for="(item, i) in currentReviewList"
                                             v-if="i <  index * 8 && i >= (index - 1) * 8" :key="item.liveId">
-                                        <router-link :to="getUrl(item)">
+                                        <a :href="getUrl(item)" target="_blank">
                                             <Card>
                                                 <p slot="title">{{item.subTitle}}</p>
 
@@ -69,7 +72,7 @@
                                                     <span v-else>电台</span>
                                                 </div>
                                             </Card>
-                                        </router-link>
+                                        </a>
                                     </Col>
                                 </Row>
                                 <Page :total="reviewTotal" :page-size="pageSize" size="small" show-total
@@ -85,7 +88,7 @@
 </template>
 
 <script>
-    import {Member, groups} from '../48infos';
+    import {groups, Member} from '../48infos';
 
     export default {
         name:'Home',
@@ -162,6 +165,7 @@
                             item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
                             return item;
                         });
+
                         this.reviewTotal = this.reviewList.length;
 
                         this.onPageChange(1);
@@ -181,11 +185,11 @@
             },
             getUrl:function(item){
                 if(item.streamPath.includes('.flv') || item.streamPath.includes('.mp4')){
-                    return '/flvjs/' + item.liveId;
+                    return '/#/flvjs/' + item.liveId;
                 }else if(item.streamPath.includes('.m3u8')){
-                    return '/videojs/' + item.liveId;
+                    return '/#/videojs/' + item.liveId;
                 }else{
-                    return '/';
+                    return '/#/';
                 }
             },
             cover:function(cover){
