@@ -341,29 +341,6 @@ const teams = [
     }
 ];
 
-// const teams = {
-//     "0":[0, "官方", "90CCEA"],
-//     "1001":[10, "TEAM SII", "90CCEA"],
-//     "1002":[10, "TEAM NII", "AD85BA"],
-//     "1003":[10, "TEAM HII", "F39800"],
-//     "1004":[10, "TEAM X", "B1D61B"],
-//     "1005":[10, "TEAM XII", "00BE6E"],
-//     "1006":[10, "TEAM FT", "41b400"],
-//     "1007":[10, "预备生", "a7b0ba"],
-//     "1101":[11, "TEAM B", "FF2471"],
-//     "1102":[11, "TEAM E", "0CC8C3"],
-//     "1103":[11, "TEAM J", "006ab7"],
-//     "1201":[12, "TEAM G", "AAC913"],
-//     "1202":[12, "TEAM NIII", "FFD700"],
-//     "1203":[12, "TEAM Z", "ea627c"],
-//     "1207":[12, "预备生", "a7b0ba"],
-//     "1301":[13, "TEAM SIII", "e70095"],
-//     "1302":[13, "TEAM HIII", "4f008c"],
-//     "1401":[14, "TEAM C", "9d6124"],
-//     "1402":[14, "TEAM K", "ff5043"],
-//     "1403":[14, "预备生", "a7b0ba"]
-// };
-
 
 const members = [
     {
@@ -13812,9 +13789,9 @@ class Group {
         this.id = groupId;
         this.name = groupsObj[groupId];
         this.teams = [];
-        for(const id in teams){
-            if(teams[id][0] == this.id){
-                this.teams.push(new Team(id));
+        for(let team of teams){
+            if(team.group_id == groupId){
+                this.teams.push(new Team(team.team_id));
             }
         }
     }
