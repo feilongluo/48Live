@@ -2,6 +2,71 @@ const groupsObj = {"10":"SNH48", "11":"BEJ48", "12":"GNZ48", "13":"SHY48", "14":
 
 const teams = [
     {
+        "team_id": 0,
+        "group_id": 10,
+        "team_name": "SNH48",
+        "full_logo": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo1": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo2": "/mediasource/teamLogo2/all/icon_48guanfang.png",
+        "avatar_background": "/mediasource/avatarBackground/all/pattern_card_team_s.png",
+        "color": "90CCEA",
+        "status": 1,
+        "ctime": "2016-11-01 00:00:00",
+        "utime": "2017-03-14 18:08:56"
+    },
+    {
+        "team_id": 0,
+        "group_id": 11,
+        "team_name": "BEJ48",
+        "full_logo": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo1": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo2": "/mediasource/teamLogo2/all/icon_48guanfang.png",
+        "avatar_background": "/mediasource/avatarBackground/all/pattern_card_team_s.png",
+        "color": "90CCEA",
+        "status": 1,
+        "ctime": "2016-11-01 00:00:00",
+        "utime": "2017-03-14 18:08:56"
+    },
+    {
+        "team_id": 0,
+        "group_id": 12,
+        "team_name": "GNZ48",
+        "full_logo": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo1": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo2": "/mediasource/teamLogo2/all/icon_48guanfang.png",
+        "avatar_background": "/mediasource/avatarBackground/all/pattern_card_team_s.png",
+        "color": "90CCEA",
+        "status": 1,
+        "ctime": "2016-11-01 00:00:00",
+        "utime": "2017-03-14 18:08:56"
+    },
+    {
+        "team_id": 0,
+        "group_id": 13,
+        "team_name": "SHY48",
+        "full_logo": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo1": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo2": "/mediasource/teamLogo2/all/icon_48guanfang.png",
+        "avatar_background": "/mediasource/avatarBackground/all/pattern_card_team_s.png",
+        "color": "90CCEA",
+        "status": 1,
+        "ctime": "2017-02-21 21:00:58",
+        "utime": "2017-03-14 18:08:56"
+    },
+    {
+        "team_id": 0,
+        "group_id": 14,
+        "team_name": "CKG48",
+        "full_logo": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo1": "/mediasource/teamLogo/all/ic_teamflag_48.png",
+        "logo2": "/mediasource/teamLogo2/all/icon_48guanfang.png",
+        "avatar_background": "/mediasource/avatarBackground/all/pattern_card_team_s.png",
+        "color": "90CCEA",
+        "status": 1,
+        "ctime": "2017-10-20 10:39:00",
+        "utime": "2017-10-20 10:39:00"
+    },
+    {
         "team_id": 1001,
         "group_id": 10,
         "team_name": "TEAM SII",

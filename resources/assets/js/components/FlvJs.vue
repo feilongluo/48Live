@@ -13,7 +13,8 @@
                         <video class="video" id="liveVideo" ref="video"></video>
 
 
-                        <player-controls ref="controls" :is-muted="isMuted" :show-progress="isReview"
+                        <player-controls ref="controls" :show-play-button="isReview" :is-muted="isMuted"
+                                :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="volumeChange"

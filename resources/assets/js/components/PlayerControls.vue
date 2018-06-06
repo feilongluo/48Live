@@ -8,9 +8,9 @@
         </div>
 
         <div class="button-box">
-            <Icon class="button" @click="play" type="play" v-if="!isPlaying"></Icon>
+            <Icon class="button" @click="play" type="play" v-if="!isPlaying && showPlayButton"></Icon>
 
-            <Icon class="button" @click="pause" type="pause" v-if="isPlaying"></Icon>
+            <Icon class="button" @click="pause" type="pause" v-if="isPlaying && showPlayButton"></Icon>
 
             <div class="volume-box">
                 <Icon style="margin-right:8px;" class="volume-icon" type="volume-high" @click="mute"
@@ -61,6 +61,10 @@
                 type:Number,
                 required:true
             },
+            showPlayButton:{
+                type:Boolean,
+                default:true
+            }
         },
         watch:{
             currentTime:function(currentTime){
