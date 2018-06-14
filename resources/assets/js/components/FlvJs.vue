@@ -24,7 +24,8 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
-                        <div class="barrage-container" ref="barrage"></div>
+                        <!--<div class="barrage-container" ref="barrage"></div>-->
+                        <barrage ref="barrage" class="barrage-container"></barrage>
                     </Card>
                 </div>
             </Content>
@@ -36,13 +37,14 @@
     import PlayerHeader from './PlayerHeader';
     import PlayerControls from './PlayerControls';
     import ChatRoom from '../48chatroom';
+    import Barrage from "./Barrage";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
 
     export default {
         name:'FlvJs',
-        components:{PlayerControls, PlayerHeader},
+        components:{Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
                 spinShow:true,
@@ -76,11 +78,14 @@
             }
         },
         created:function(){
+            this.$Notice.config({
+               top:80
+            });
             this.liveId = this.$route.params.liveId;
             this.getOne();
         },
         mounted:function(){
-            this.send = this.$start(this.$refs.barrage);
+
         },
         methods:{
             getOne:function(){
@@ -151,13 +156,17 @@
                             this.duration = media.duration / 1000;
                         });
                         this.flvPlayer.load();
-
                         this.spinShow = false;
+
+                        this.$Notice.success({
+                           title:'弹幕已加载',
+                           desc:''
+                        });
                     }else{
                         this.$Message.error(res.data.msg);
                     }
                 }).catch(error =>{
-                    this.$Message.error('弹幕加载失败');
+                    this.$Notice.error('弹幕加载失败');
                     console.log(error);
                 });
             },
@@ -209,11 +218,7 @@
             loadBarrages:function(){
                 const barrageTime = this.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
-                    this.send({
-                        text:this.currentBarrage.content,
-                        speed:3,
-                        classname:'style1'
-                    });
+                    this.$refs.barrage.shoot(this.currentBarrage.content);
                     this.currentBarrage = this.barrageList.shift();
                     setTimeout(() =>{
                         this.loadBarrages();
@@ -229,7 +234,6 @@
                             title:'聊天室连接成功',
                             desc:''
                         });
-                        this.chatRoom.close();
                     },
                     onDisconnect:(message) =>{
                         this.$Notice.success({
@@ -249,11 +253,7 @@
                             if(message.type == 'text'){
                                 const custom = JSON.parse(message.custom);
                                 if(custom.contentType == 1){
-                                    this.send({
-                                        text:custom.content,
-                                        speed:3,
-                                        classname:'style1'
-                                    });
+                                    this.$refs.barrage.shoot(custom.content);
                                 }
                             }
                         });
@@ -291,8 +291,7 @@
     }
 
     .video {
-        min-height: 400px;
-        min-width: 320px;
+        min-width: 400px;
         max-height: 640px;
     }
 </style>

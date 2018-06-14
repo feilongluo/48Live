@@ -21,7 +21,6 @@ npm run dev
 * ### [vue-video-player](https://github.com/surmon-china/vue-video-player)
 * ### [flv.js](https://github.com/Bilibili/flv.js)
 * ### [iview](https://github.com/iview/iview)
-* ### [vue2-barrage](https://github.com/a13821190779/barrage)
 
 ## 最后
 # 超绝可爱黄婷婷

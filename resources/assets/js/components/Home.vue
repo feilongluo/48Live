@@ -47,8 +47,9 @@
                                         </a>
                                     </Col>
                                 </Row>
-                                <Page :total="liveTotal" :page-size="pageSize" size="small" show-total
-                                        @on-change="onPageChange"></Page>
+                                <Page :current="livePage" :total="liveTotal" :page-size="pageSize" size="small"
+                                        show-total
+                                        @on-change="onLivePageChange"></Page>
                             </TabPane>
 
                             <TabPane label="回放">
@@ -75,8 +76,9 @@
                                         </a>
                                     </Col>
                                 </Row>
-                                <Page :total="reviewTotal" :page-size="pageSize" size="small" show-total
-                                        @on-change="onPageChange"></Page>
+                                <Page :current="reviewPage" :total="reviewTotal" :page-size="pageSize" size="small"
+                                        show-total
+                                        @on-change="onReviewPageChange"></Page>
                             </TabPane>
                         </Tabs>
                     </div>
@@ -105,7 +107,9 @@
                 selectedMember:[],
                 limit:800,
                 liveTotal:0,
-                reviewTotal:0
+                reviewTotal:0,
+                livePage:1,
+                reviewPage:1,
             }
         },
         created:function(){
@@ -168,7 +172,8 @@
 
                         this.reviewTotal = this.reviewList.length;
 
-                        this.onPageChange(1);
+                        this.onLivePageChange(this.livePage);
+                        this.onReviewPageChange(this.reviewPage);
                         this.spinShow = false;
                     }else{
                         this.spinShow = false;
@@ -178,9 +183,14 @@
                     console.log(error);
                 });
             },
-            onPageChange:function(page){
+            onLivePageChange:function(page){
+                this.livePage = page;
                 const start = (page - 1) * this.pageSize;
                 this.currentLiveList = this.liveList.slice(start, start + this.pageSize);
+            },
+            onReviewPageChange:function(page){
+                this.reviewPage = page;
+                const start = (page - 1) * this.pageSize;
                 this.currentReviewList = this.reviewList.slice(start, start + this.pageSize);
             },
             getUrl:function(item){

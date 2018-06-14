@@ -77,6 +77,9 @@ class LiveController extends Controller{
 			}
 			$time = str_replace('[', '', $arr[0]);
 			$arr = explode("\t", $arr[1]);
+			if(!is_array($arr) || empty($arr) || count($arr) < 2){
+				continue;
+			}
 			$barrages[] = [
 				'time' => $time,
 				'username' => $arr[0],

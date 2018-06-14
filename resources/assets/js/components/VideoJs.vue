@@ -22,7 +22,7 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
-                        <div class="barrage-container" ref="barrage"></div>
+                        <barrage class="barrage-container" ref="barrage"></barrage>
                     </Card>
                 </div>
             </Content>
@@ -33,13 +33,14 @@
 <script>
     import PlayerHeader from "./PlayerHeader";
     import PlayerControls from "./PlayerControls";
+    import Barrage from "./Barrage";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
 
     export default {
         name:'VideoJs',
-        components:{PlayerControls, PlayerHeader},
+        components:{Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
                 playerOptions:{
@@ -87,11 +88,14 @@
             }
         },
         created:function(){
+            this.$Notice.config({
+                top:80
+            });
             this.liveId = this.$route.params.liveId;
             this.getOne();
         },
         mounted:function(){
-            this.send = this.$start(this.$refs.barrage);
+
         },
         methods:{
             getOne:function(){
@@ -133,7 +137,7 @@
                         });
                         this.spinShow = false;
                     }else{
-                        this.$Message.error(res.data.msg);
+                        this.$Notice.error(res.data.msg);
                     }
                 }).catch(error =>{
                     this.spinShow = false;
@@ -149,11 +153,16 @@
                     if(res.data.errorCode == 0){
                         this.finalBarrageList = this.barrageList = res.data.data.barrages;
                         this.currentBarrage = this.barrageList.shift();
+
+                        this.$Notice.success({
+                            title:'弹幕已加载',
+                            desc:''
+                        });
                     }else{
-                        this.$Message.error(res.data.msg);
+                        this.$Notice.error(res.data.msg);
                     }
                 }).catch(error =>{
-                    this.$Message.error('弹幕加载失败');
+                    this.$Notice.error('弹幕加载失败');
                     console.log(error);
                 });
             },
@@ -205,11 +214,7 @@
             loadBarrages:function(){
                 const barrageTime = this.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
-                    this.send({
-                        text:this.currentBarrage.content,
-                        speed:3,
-                        classname:'style1'
-                    });
+                    this.$refs.barrage.shoot(this.currentBarrage.content);
                     this.currentBarrage = this.barrageList.shift();
                     this.loadBarrages();
                 }
