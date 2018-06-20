@@ -15,23 +15,8 @@
                 barrageList:[],
             };
         },
-        created:function(){
-
-        },
         mounted:function(){
-            const canvas = this.$refs.canvas;
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-
-            this.context = canvas.getContext('2d');
-            this.context.fillStyle = '#000000';
-            this.context.font ='bold ' + TEXT_SIZE + 'px Microsoft YaHei';
-
-            const react = canvas.getBoundingClientRect();
-            this.width = react.right - react.left;
-            this.height = react.bottom - react.top;
-
-            this.start();
+            this.init();
         },
         methods:{
             shoot:function(content){
@@ -45,12 +30,15 @@
                 });
             },
             start:function(){
-                setInterval(() =>{
+               setInterval(() =>{
                     this.context.clearRect(0, 0, this.width, this.height);
                     this.barrageList.forEach((barrage, index) =>{
                         this.context.fillStyle = barrage.color || '#000000';
                         this.context.fillText(barrage.content, barrage.left, barrage.top);
                         barrage.left -= 0.9;
+                    });
+
+                    this.barrageList.forEach((barrage, index) =>{
                         if(barrage.left + this.context.measureText(barrage.content).width < 0){
                             this.barrageList.splice(index, 1);
                         }
@@ -59,6 +47,21 @@
             },
             randomColor:function(){
                 return '#' + Math.floor(Math.random() * 0xffffff).toString(16);
+            },
+            init:function(){
+                const canvas = this.$refs.canvas;
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                this.context = canvas.getContext('2d');
+                this.context.fillStyle = '#000000';
+                this.context.font ='bold ' + TEXT_SIZE + 'px Microsoft YaHei';
+
+                const react = canvas.getBoundingClientRect();
+                this.width = react.right - react.left;
+                this.height = react.bottom - react.top;
+
+                this.start();
             }
         }
     }

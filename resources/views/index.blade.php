@@ -7,7 +7,7 @@
 
     <title>口袋48成员直播</title>
 
-    <link rel="stylesheet" href="{{asset('css/app.css')}}?v={{str_random()}}">
+    <link rel="stylesheet" href="{{asset('css/app.css')}}">
 </head>
 <body>
 <div id="app">
@@ -15,6 +15,6 @@
         <router-view></router-view>
     </div>
 </div>
-<script src="{{asset('js/app.js')}}?v={{str_random()}}"></script>
+<script src="{{asset('js/app.js')}}"></script>
 </body>
 </html>
