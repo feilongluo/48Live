@@ -5,7 +5,7 @@
 <script>
     const USERNAME_COLOR = '#999999';
 
-    const TEXT_SIZE = 28;
+    const TEXT_SIZE = 24;
 
     export default {
         name:'Barrage',
@@ -83,7 +83,6 @@
                     this.randomCount++;
                     return this.randomTop();
                 }
-                console.log(this.randomCount);
                 this.randomCount = 0;
                 return top;
             }

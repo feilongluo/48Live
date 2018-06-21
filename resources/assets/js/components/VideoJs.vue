@@ -230,7 +230,10 @@
             loadBarrages:function(){
                 const barrageTime = this.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
-                    this.$refs.barrage.shoot(this.currentBarrage.content);
+                    this.$refs.barrage.shoot({
+                        content:this.currentBarrage.content,
+                        username:this.currentBarrage.username
+                    });
                     this.currentBarrage = this.barrageList.shift();
                     this.loadBarrages();
                 }
