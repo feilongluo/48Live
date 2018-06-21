@@ -16,6 +16,12 @@ npm install
 npm run dev
 ```
 
+## 更新日志
+- 2018-06-21
+1. 弹幕添加显示发送者
+2. 电台添加图片跑马灯
+
+
 
 ## 用到的一些开源项目
 * ### [vue-video-player](https://github.com/surmon-china/vue-video-player)
