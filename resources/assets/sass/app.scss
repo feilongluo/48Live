@@ -32,7 +32,19 @@ div[id^="vjs_video_"] {
   overflow: hidden;
 }
 
-.barrage{
-  font-size:24px !important;
-  color:white
+.barrage {
+  font-size: 24px !important;
+  color: white
+}
+
+.ivu-carousel-track, .ivu-carousel-item {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  height: 640px;
+}
+
+.picture{
+  max-width: 400px;
+  max-height:640px;
 }

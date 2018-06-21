@@ -32,7 +32,7 @@
                                             <Card>
                                                 <p slot="title">{{item.subTitle}}</p>
 
-                                                <img ref="cover" class="cover" :src="cover(item.cover)">
+                                                <img ref="cover" class="cover" :src="item.cover">
                                                 <p style="color:#ccc;">{{item.date}}</p>
                                                 <div style="display: flex;justify-content: space-between;">
                                                     <div>
@@ -61,7 +61,7 @@
                                             <Card>
                                                 <p slot="title">{{item.subTitle}}</p>
 
-                                                <img ref="cover" class="cover" :src="cover(item.cover)">
+                                                <img ref="cover" class="cover" :src="item.cover">
                                                 <p style="color:#ccc;">{{item.date}}</p>
                                                 <div style="display: flex;justify-content: space-between;">
                                                     <div>
@@ -91,6 +91,7 @@
 
 <script>
     import {groups, Member} from '../48infos';
+    import Tools from "../tools";
 
     export default {
         name:'Home',
@@ -152,10 +153,9 @@
                         limit:this.limit
                     }
                 }).then(res =>{
-                    if(res.data.errorCode === 0){
+                    if(res.data.errorCode == 0){
                         this.liveList = res.data.data.liveList.map(item =>{
-                            const pictures = item.picPath.split(',');
-                            item.cover = pictures[0];
+                            item.cover = Tools.pictureUrls(item.picPath)[0];
                             item.member = new Member(item.memberId);
                             item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
                             return item;
@@ -163,8 +163,7 @@
                         this.liveTotal = this.liveList.length;
 
                         this.reviewList = res.data.data.reviewList.map(item =>{
-                            const pictures = item.picPath.split(',');
-                            item.cover = pictures[0];
+                            item.cover = Tools.pictureUrls(item.picPath)[0];
                             item.member = new Member(item.memberId);
                             item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
                             return item;
@@ -176,6 +175,7 @@
                         this.onReviewPageChange(this.reviewPage);
                         this.spinShow = false;
                     }else{
+                        console.log(res.data.msg);
                         this.spinShow = false;
                     }
                 }).catch(error =>{
@@ -202,36 +202,7 @@
                     return '/#/';
                 }
             },
-            cover:function(cover){
-                if(cover.indexOf('http') >= 0){
-                    return cover;
-                }else{
-                    return 'https://source.48.cn' + cover;
-                }
-            }
         }
-    }
-
-    Date.prototype.format = function(fmt){
-        const o = {
-            "M+":this.getMonth() + 1,                 //月份
-            "d+":this.getDate(),                    //日
-            "h+":this.getHours(),                   //小时
-            "m+":this.getMinutes(),                 //分
-            "s+":this.getSeconds(),                 //秒
-            "q+":Math.floor((this.getMonth() + 3) / 3), //季度
-            "S":this.getMilliseconds()             //毫秒
-        };
-        if(/(y+)/.test(fmt)){
-            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-        }
-        for(const k in o){
-            if(new RegExp("(" + k + ")").test(fmt)){
-                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) :
-                    (("00" + o[k]).substr(("" + o[k]).length)));
-            }
-        }
-        return fmt;
     }
 </script>
 

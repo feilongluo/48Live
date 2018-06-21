@@ -2,7 +2,7 @@
     <div class="layout">
         <Layout>
             <player-header :other-player="'/flvjs/' + liveId" :video-url="streamPath"></player-header>
-            <Content style="padding: 16px 32px;">
+            <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
 
@@ -10,7 +10,13 @@
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">{{title}}</p>
 
-                        <video-player ref="videoPlayer" class="video" :options="playerOptions"></video-player>
+                        <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
+                            <CarouselItem  v-for="picture in pictures" :key="picture">
+                                <img class="picture" :src="picture">
+                            </CarouselItem>
+                        </Carousel>
+
+                        <video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>
 
                         <player-controls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
@@ -34,6 +40,7 @@
     import PlayerHeader from "./PlayerHeader";
     import PlayerControls from "./PlayerControls";
     import Barrage from "./Barrage";
+    import Tools from "../tools";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -72,6 +79,8 @@
                 currentBarrage:{},
                 finalBarrageList:[],
                 barrageList:[],
+                isRadio:false,
+                pictures:[],
             }
         },
         computed:{
@@ -106,6 +115,9 @@
                         this.subTitle = res.data.data.subTitle;
                         this.isReview = res.data.data.isReview;
                         this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
+                        this.isRadio = res.data.data.liveType == 2;
+
+                        this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
                         this.player.volume(this.$refs.controls.volume * 0.01);
 
@@ -159,7 +171,10 @@
                             desc:''
                         });
                     }else{
-                        this.$Notice.error(res.data.msg);
+                        this.$Notice.error({
+                            title:res.data.msg,
+                            desc:''
+                        });
                     }
                 }).catch(error =>{
                     this.$Notice.error('弹幕加载失败');
@@ -206,6 +221,7 @@
                 this.currentBarrage = this.barrageList.shift();
             },
             timeToSecond:function(time){
+                if(!time) return;
                 const hours = time.split(':')[0];
                 const minutes = time.split(':')[1];
                 const seconds = time.split(':')[2];
@@ -237,5 +253,7 @@
     .video {
         display: flex;
         justify-content: center;
+        width: 400px;
+        height: 640px;
     }
 </style>

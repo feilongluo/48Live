@@ -2,7 +2,7 @@
     <div class="layout">
         <Layout>
             <player-header :other-player="'/videojs/' + liveId" :video-url="streamPath"></player-header>
-            <Content style="padding: 16px 32px;">
+            <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
 
@@ -10,8 +10,13 @@
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">{{title}}</p>
 
-                        <video class="video" id="liveVideo" ref="video"></video>
+                        <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
+                            <CarouselItem  v-for="picture in pictures" :key="picture">
+                                <img class="picture" :src="picture">
+                            </CarouselItem>
+                        </Carousel>
 
+                        <video class="video" id="liveVideo" ref="video" v-else></video>
 
                         <player-controls ref="controls" :show-play-button="isReview" :is-muted="isMuted"
                                 :show-progress="isReview"
@@ -24,7 +29,6 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
-                        <!--<div class="barrage-container" ref="barrage"></div>-->
                         <barrage ref="barrage" class="barrage-container"></barrage>
                     </Card>
                 </div>
@@ -38,13 +42,15 @@
     import PlayerControls from './PlayerControls';
     import ChatRoom from '../48chatroom';
     import Barrage from "./Barrage";
+    import Casitem from "iview/src/components/cascader/casitem";
+    import Tools from "../tools";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
 
     export default {
         name:'FlvJs',
-        components:{Barrage, PlayerControls, PlayerHeader},
+        components:{Casitem, Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
                 spinShow:true,
@@ -64,7 +70,10 @@
                 currentBarrage:{},
                 finalBarrageList:[],
                 barrageList:[],
-                roomId:''
+                roomId:'',
+                isRadio:false,
+                pictures:[],
+                pictureIndex:0,
             }
         },
         computed:{
@@ -79,13 +88,10 @@
         },
         created:function(){
             this.$Notice.config({
-               top:80
+                top:80
             });
             this.liveId = this.$route.params.liveId;
             this.getOne();
-        },
-        mounted:function(){
-
         },
         methods:{
             getOne:function(){
@@ -97,6 +103,9 @@
                         this.isReview = res.data.data.isReview;
                         this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
                         this.roomId = res.data.data.roomId;
+                        this.isRadio = res.data.data.liveType == 2;
+
+                        this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
                         this.init();
                     }else{
@@ -151,20 +160,23 @@
                     if(res.data.errorCode == 0){
                         this.finalBarrageList = this.barrageList = res.data.data.barrages;
                         this.currentBarrage = this.barrageList.shift();
-                        //时长
-                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
-                            this.duration = media.duration / 1000;
-                        });
-                        this.flvPlayer.load();
-                        this.spinShow = false;
 
                         this.$Notice.success({
-                           title:'弹幕已加载',
-                           desc:''
+                            title:'弹幕已加载',
+                            desc:''
                         });
                     }else{
-                        this.$Message.error(res.data.msg);
+                        this.$Notice.error({
+                            title:res.data.msg,
+                            desc:''
+                        });
                     }
+                    //时长
+                    this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                        this.duration = media.duration / 1000;
+                    });
+                    this.flvPlayer.load();
+                    this.spinShow = false;
                 }).catch(error =>{
                     this.$Notice.error('弹幕加载失败');
                     console.log(error);
@@ -210,6 +222,7 @@
                 this.volume = volume;
             },
             timeToSecond:function(time){
+                if(!time) return;
                 const hours = time.split(':')[0];
                 const minutes = time.split(':')[1];
                 const seconds = time.split(':')[2];
@@ -218,11 +231,12 @@
             loadBarrages:function(){
                 const barrageTime = this.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
-                    this.$refs.barrage.shoot(this.currentBarrage.content);
+                    this.$refs.barrage.shoot({
+                        content:this.currentBarrage.content,
+                        username:this.currentBarrage.username
+                    });
                     this.currentBarrage = this.barrageList.shift();
-                    setTimeout(() =>{
-                        this.loadBarrages();
-                    }, 20);
+                    this.loadBarrages();
                 }
             },
             //连接聊天室
@@ -253,7 +267,10 @@
                             if(message.type == 'text'){
                                 const custom = JSON.parse(message.custom);
                                 if(custom.contentType == 1){
-                                    this.$refs.barrage.shoot(custom.content);
+                                    this.$refs.barrage.shoot({
+                                        content:custom.content,
+                                        username:custom.senderName
+                                    });
                                 }
                             }
                         });
@@ -291,7 +308,7 @@
     }
 
     .video {
-        min-width: 400px;
-        max-height: 640px;
+        width: 400px;
+        height: 640px;
     }
 </style>

@@ -36,3 +36,22 @@ div[id^="vjs_video_"] {
   color: white;
 }
 
+.ivu-carousel-track,
+.ivu-carousel-item {
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 640px;
+}
+
+.picture {
+  max-width: 400px;
+  max-height: 640px;
+}
+

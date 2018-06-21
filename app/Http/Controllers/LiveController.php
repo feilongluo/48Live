@@ -66,30 +66,34 @@ class LiveController extends Controller{
 		if(!$url){
 			return $this->failed('url不能为空');
 		}
-		$content = file_get_contents($url);
 
-		$array = explode("\r\n", $content);
-		$barrages = [];
-		foreach($array as $item){
-			$arr = explode(']', $item);
-			if(!is_array($arr) || empty($arr) || count($arr) < 2){
-				continue;
+		try{
+			$content = file_get_contents($url);
+			$array = explode("\r\n", $content);
+			$barrages = [];
+			foreach($array as $item){
+				$arr = explode(']', $item);
+				if(!is_array($arr) || empty($arr) || count($arr) < 2){
+					continue;
+				}
+				$time = str_replace('[', '', $arr[0]);
+				$arr = explode("\t", $arr[1]);
+				if(!is_array($arr) || empty($arr) || count($arr) < 2){
+					continue;
+				}
+				$barrages[] = [
+					'time' => $time,
+					'username' => $arr[0],
+					'content' => $arr[1]
+				];
 			}
-			$time = str_replace('[', '', $arr[0]);
-			$arr = explode("\t", $arr[1]);
-			if(!is_array($arr) || empty($arr) || count($arr) < 2){
-				continue;
-			}
-			$barrages[] = [
-				'time' => $time,
-				'username' => $arr[0],
-				'content' => $arr[1]
-			];
+
+			return $this->success([
+				'barrages' => $barrages
+			]);
+		}catch(\Exception $exception){
+			return $this->failed('弹幕获取失败，大概还在生成');
 		}
-
-		return $this->success([
-			'barrages' => $barrages
-		]);
 	}
 
 	public function token(){
