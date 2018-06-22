@@ -11,7 +11,7 @@
                         <p slot="extra">{{title}}</p>
 
                         <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
-                            <CarouselItem  v-for="picture in pictures" :key="picture">
+                            <CarouselItem v-for="picture in pictures" :key="picture">
                                 <img class="picture" :src="picture">
                             </CarouselItem>
                         </Carousel>
@@ -29,7 +29,28 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
+
                         <barrage ref="barrage" class="barrage-container"></barrage>
+
+                        <div class="barrage-input-box">
+                            <Tooltip  placement="top">
+                                <div slot="content">
+                                    <p>第一次发送弹幕后将变为只读，刷新后才能再次改</p>
+                                    <p>请勿滥用</p>
+                                    <p>请勿Diss小偶像</p>
+                                    <p>请勿Ky</p>
+                                </div>
+                                <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
+                            </Tooltip>
+
+                            <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
+                                    @on-enter="sendBarrage"/>
+
+                            <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
+                                    :disabled="sendDisabled">
+                                {{sendText}}
+                            </Button>
+                        </div>
                     </Card>
                 </div>
             </Content>
@@ -44,15 +65,21 @@
     import Barrage from "./Barrage";
     import Casitem from "iview/src/components/cascader/casitem";
     import Tools from "../tools";
+    import {Member} from "../48infos";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
+
+    const SENDER_ID = '' + new Date().getTime() + Math.round(Math.random() * 10);   //发送者id
+
+    const BARRAGE_SEND_INTERVAL = 20;   //弹幕发送间隔
 
     export default {
         name:'FlvJs',
         components:{Casitem, Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
+                member:{},
                 spinShow:true,
                 liveId:'',
                 streamPath:'',
@@ -74,6 +101,12 @@
                 isRadio:false,
                 pictures:[],
                 pictureIndex:0,
+                content:'',
+                senderName:'',
+                senderNameReadonly:false,
+                sendDisabled:false,
+                sendText:'发送',
+                seconds:BARRAGE_SEND_INTERVAL,
             }
         },
         computed:{
@@ -104,6 +137,9 @@
                         this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
                         this.roomId = res.data.data.roomId;
                         this.isRadio = res.data.data.liveType == 2;
+                        this.member = new Member(res.data.data.memberId);
+
+                        this.senderName = Tools.getSenderName() ||this.member.name + '的小粉丝';
 
                         this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
@@ -111,6 +147,7 @@
                     }else{
                         this.$Message.error(res.data.msg);
                     }
+                    console.log(res.data);
                 }).catch(error =>{
                     this.spinShow = false;
                     console.log(error);
@@ -147,6 +184,9 @@
                     if(this.isReview){  //录播
                         this.getBarrages();
                     }else{              //直播
+                        this.flvPlayer.load();
+                        this.spinShow = false;
+                        this.play();
                         this.connectChatRoom();
                     }
                 }
@@ -239,6 +279,51 @@
                     this.loadBarrages();
                 }
             },
+            sendBarrage:function(){
+                if(this.seconds != BARRAGE_SEND_INTERVAL){
+                    return;
+                }
+                const content = {
+                    senderId:SENDER_ID,
+                    senderName:this.senderName,
+                    username:this.senderName,
+                    senderLevel:'1',
+                    senderAvatar:'',
+                    senderRole:0,
+                    source:'',
+                    content:this.content,
+                    contentType:1,
+                    platform:'android'
+                };
+                const message = {
+                    text:this.content,
+                    custom:JSON.stringify(content),
+                    done:(error) =>{
+                        if(error == null){
+                            this.$refs.barrage.shoot({
+                                username:this.senderName,
+                                content:this.content
+                            });
+                            this.senderNameReadonly = true;
+                        }
+                        this.sendDisabled = true;
+                        this.content = '';
+                        const timer = setInterval(() =>{
+                            this.sendText = '发送(' + this.seconds + ')';
+                            this.seconds--;
+                            if(this.seconds == 0){
+                                clearInterval(timer);
+                                this.seconds = BARRAGE_SEND_INTERVAL;
+                                this.sendDisabled = false;
+                            }
+                        }, 1000);
+
+                        Tools.setSenderName(this.senderName);
+                    }
+                };
+
+                this.chatRoom.sendMessage(message);
+            },
             //连接聊天室
             connectChatRoom:function(){
                 this.chatRoom = new ChatRoom({
@@ -286,9 +371,7 @@
                         console.log(error);
                     },
                     onTokenSuccess:() =>{
-                        this.flvPlayer.load();
-                        this.spinShow = false;
-                        this.play();
+
                     }
                 });
             }
@@ -297,18 +380,14 @@
 </script>
 
 <style scoped>
-    .player-container {
-        display: flex;
-    }
-
-    .barrage-container {
-        flex: 1 0 auto;
-        width: 100%;
-        height: 640px;
-    }
-
     .video {
         width: 400px;
         height: 640px;
+    }
+
+    .barrage-input-box {
+        display: flex;
+        align-items: flex-end;
+        height: 75px;
     }
 </style>

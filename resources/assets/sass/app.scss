@@ -48,3 +48,13 @@ div[id^="vjs_video_"] {
   max-width: 400px;
   max-height:640px;
 }
+
+.player-container {
+  display: flex;
+}
+
+.barrage-container {
+  flex: 1 0 auto;
+  width: 100%;
+  height: 600px;
+}

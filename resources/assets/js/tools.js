@@ -31,6 +31,14 @@ class Tools {
             }
         });
     }
+
+    static setSenderName(senderName){
+        localStorage.setItem('senderName', senderName);
+    }
+
+    static getSenderName(){
+        return localStorage.getItem('senderName');
+    }
 }
 
 export default Tools;

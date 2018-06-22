@@ -31,6 +31,10 @@ class ChatRoom {
             }
         });
     }
+
+    sendMessage(message){
+        return this.chatRoom.sendText(message);
+    }
 }
 
 export default ChatRoom;
