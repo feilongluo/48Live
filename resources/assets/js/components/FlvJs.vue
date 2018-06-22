@@ -32,16 +32,17 @@
 
                         <barrage ref="barrage" class="barrage-container"></barrage>
 
-                        <div class="barrage-input-box">
-                            <Tooltip  placement="top">
+                        <div class="barrage-input-box" v-if="!isReview">
+                            <Poptip trigger="hover" title="发送者名称">
                                 <div slot="content">
-                                    <p>第一次发送弹幕后将变为只读，刷新后才能再次改</p>
-                                    <p>请勿滥用</p>
-                                    <p>请勿Diss小偶像</p>
-                                    <p>请勿Ky</p>
+                                        <p>第一次发送弹幕后将变为只读</p>
+                                        <p>刷新页面后可再次更改</p>
+                                        <p>请勿滥用</p>
+                                        <p>请勿Diss小偶像</p>
+                                        <p>请勿Ky</p>
                                 </div>
                                 <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
-                            </Tooltip>
+                            </Poptip>
 
                             <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
                                     @on-enter="sendBarrage"/>
@@ -61,7 +62,6 @@
 <script>
     import PlayerHeader from './PlayerHeader';
     import PlayerControls from './PlayerControls';
-    import ChatRoom from '../48chatroom';
     import Barrage from "./Barrage";
     import Casitem from "iview/src/components/cascader/casitem";
     import Tools from "../tools";
@@ -107,6 +107,7 @@
                 sendDisabled:false,
                 sendText:'发送',
                 seconds:BARRAGE_SEND_INTERVAL,
+                chatroom:null,
             }
         },
         computed:{
@@ -147,7 +148,6 @@
                     }else{
                         this.$Message.error(res.data.msg);
                     }
-                    console.log(res.data);
                 }).catch(error =>{
                     this.spinShow = false;
                     console.log(error);
@@ -170,7 +170,6 @@
                         if(this.isReview){  //录播
                             this.loadBarrages();
                         }
-
                     });
                     //播放结束
                     this.$refs.video.addEventListener('ended', () =>{
@@ -181,13 +180,20 @@
                         });
                     });
 
+                    this.spinShow = false;
+                    this.flvPlayer.load();
+
                     if(this.isReview){  //录播
                         this.getBarrages();
+                        //时长
+                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                            this.duration = media.duration / 1000;
+                        });
                     }else{              //直播
-                        this.flvPlayer.load();
-                        this.spinShow = false;
-                        this.play();
-                        this.connectChatRoom();
+                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                            this.play();
+                        });
+                        this.connectChatroom();
                     }
                 }
             },
@@ -211,12 +217,6 @@
                             desc:''
                         });
                     }
-                    //时长
-                    this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
-                        this.duration = media.duration / 1000;
-                    });
-                    this.flvPlayer.load();
-                    this.spinShow = false;
                 }).catch(error =>{
                     this.$Notice.error('弹幕加载失败');
                     console.log(error);
@@ -280,24 +280,26 @@
                 }
             },
             sendBarrage:function(){
-                if(this.seconds != BARRAGE_SEND_INTERVAL){
+                if(this.seconds != BARRAGE_SEND_INTERVAL || this.content.length == 0 || this.senderName.length == 0){
                     return;
                 }
-                const content = {
+                const custom = {
                     senderId:SENDER_ID,
                     senderName:this.senderName,
                     username:this.senderName,
-                    senderLevel:'1',
+                    senderLevel:3,
                     senderAvatar:'',
                     senderRole:0,
-                    source:'',
+                    source:'member_live',
+                    sourceId:this.$route.params.liveId,
                     content:this.content,
                     contentType:1,
-                    platform:'android'
+                    platform:'android',
+                    isBarrage:0
                 };
                 const message = {
                     text:this.content,
-                    custom:JSON.stringify(content),
+                    custom:JSON.stringify(custom),
                     done:(error) =>{
                         if(error == null){
                             this.$refs.barrage.shoot({
@@ -312,6 +314,7 @@
                             this.sendText = '发送(' + this.seconds + ')';
                             this.seconds--;
                             if(this.seconds == 0){
+                                this.sendText = '发送';
                                 clearInterval(timer);
                                 this.seconds = BARRAGE_SEND_INTERVAL;
                                 this.sendDisabled = false;
@@ -322,57 +325,58 @@
                     }
                 };
 
-                this.chatRoom.sendMessage(message);
+                this.chatroom.sendText(message);
             },
             //连接聊天室
-            connectChatRoom:function(){
-                this.chatRoom = new ChatRoom({
-                    roomId:this.roomId,
-                    onConnect:() =>{
-                        this.$Notice.success({
-                            title:'聊天室连接成功',
-                            desc:''
-                        });
-                    },
-                    onDisconnect:(message) =>{
-                        this.$Notice.success({
-                            title:'聊天室连接断开',
-                            desc:''
-                        });
-                        console.log(message);
-                    },
-                    onWillConnect:() =>{
+            connectChatroom:function(){
+                const options = {
+                        roomId:this.roomId,
+                        onConnect:() =>{
+                            this.$Notice.success({
+                                title:'聊天室连接成功',
+                                desc:''
+                            });
+                        },
+                        onDisconnect:(message) =>{
+                            this.$Notice.success({
+                                title:'聊天室连接断开',
+                                desc:''
+                            });
+                            console.log(message);
+                        },
+                        onWillConnect:() =>{
 
-                    },
-                    /**
-                     * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
-                     */
-                    onMessage:messages =>{
-                        messages.forEach(message =>{
-                            if(message.type == 'text'){
-                                const custom = JSON.parse(message.custom);
-                                if(custom.contentType == 1){
-                                    this.$refs.barrage.shoot({
-                                        content:custom.content,
-                                        username:custom.senderName
-                                    });
+                        },
+                        /**
+                         * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
+                         */
+                        onMessage:messages =>{
+                            messages.forEach(message =>{
+                                if(message.type == 'text'){
+                                    const custom = JSON.parse(message.custom);
+                                    const level = custom.isBarrage ? 2 : 1;
+                                    if(custom.contentType == 1){
+                                        this.$refs.barrage.shoot({
+                                            content:custom.content,
+                                            username:custom.senderName,
+                                            level:level
+                                        });
+                                    }
                                 }
-                            }
-                        });
-                    },
-                    onError:error =>{
-                        console.log(error);
-                    },
-                    onTokenFailed:error =>{
-                        this.$Notice.success({
-                            title:'聊天室token获取失败',
-                            desc:''
-                        });
-                        console.log(error);
-                    },
-                    onTokenSuccess:() =>{
-
-                    }
+                            });
+                        },
+                        onError:error =>{
+                            console.log(error);
+                        }
+                };
+                Tools.chatroom(options).then(chatroom =>{
+                    this.chatroom = chatroom;
+                }).catch(error =>{
+                    this.$Notice.success({
+                        title:'聊天室token获取失败',
+                        desc:''
+                    });
+                    console.log(error);
                 });
             }
         }

@@ -7,6 +7,8 @@
 
     const TEXT_SIZE = 24;
 
+    const BORDER_WIDTH = 4;
+
     export default {
         name:'Barrage',
         data(){
@@ -25,10 +27,12 @@
             shoot:function(barrage){
                 const top = this.randomTop();
                 const left = this.width;
+                const level = barrage.level || 1;
+                const color = level == 1 ? '#000' : this.randomColor();
                 this.barrageList.push({
                     top:top,
                     left:left,
-                    color:this.randomColor(),
+                    color:color,
                     content:barrage.content,
                     username:barrage.username
                 });

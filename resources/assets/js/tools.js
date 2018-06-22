@@ -20,6 +20,11 @@ Date.prototype.format = function(fmt){
     return fmt;
 };
 
+import './48sdk/base-v2.8.0';
+import './48sdk/nim-v2.8.0';
+import axios from 'axios';
+import Chatroom from './48sdk/chatroom-v2.8.0';
+
 class Tools {
     static pictureUrls(picturesStr){
         const pictures = picturesStr.split(',');
@@ -29,6 +34,32 @@ class Tools {
             }else{
                 return 'https://source.48.cn' + picture;
             }
+        });
+    }
+
+    static chatroom(options){
+        return new Promise((resolve, reject) =>{
+            axios.get('/api/token').then(response =>{
+                const chatroom = new Chatroom({
+                    appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
+                    account:response.data.data.account,
+                    token:response.data.data.token,
+                    chatroomId:options.roomId,
+                    chatroomAddresses:[
+                        'weblink04.netease.im:443',
+                        /*'',*/
+                    ],
+                    onconnect:options.onConnect,
+                    onerror:options.onError,
+                    onwillreconnect:options.onWillConnnect,
+                    ondisconnect:options.onDisconnect,
+                    // // 消息
+                    onmsgs:options.onMessage
+                });
+                resolve(chatroom);
+            }).catch(error =>{
+                reject(error);
+            });
         });
     }
 
