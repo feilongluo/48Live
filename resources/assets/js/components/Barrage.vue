@@ -49,7 +49,7 @@
                         this.context.fillText(barrage.content, barrage.left +
                             this.context.measureText(barrage.username + '：').width,
                             barrage.top);
-                        barrage.left -= 0.9;
+                        barrage.left -= 1.2;
                     });
 
                     this.barrageList.forEach((barrage, index) =>{

@@ -26,10 +26,15 @@ import axios from 'axios';
 import Chatroom from './48sdk/chatroom-v2.8.0';
 
 class Tools {
+    /**
+     *
+     * @param picturesStr
+     * @returns {any[]}
+     */
     static pictureUrls(picturesStr){
         const pictures = picturesStr.split(',');
         return pictures.map(picture =>{
-            if(picture.indexOf('http') >= 0){
+            if(picture.includes('http')){
                 return picture;
             }else{
                 return 'https://source.48.cn' + picture;
@@ -37,6 +42,11 @@ class Tools {
         });
     }
 
+    /**
+     *
+     * @param options
+     * @returns {Promise<any>}
+     */
     static chatroom(options){
         return new Promise((resolve, reject) =>{
             axios.get('/api/token').then(response =>{
@@ -63,12 +73,28 @@ class Tools {
         });
     }
 
+    static timeToSecond(time){
+        if(!time) return;
+        const hours = time.split(':')[0];
+        const minutes = time.split(':')[1];
+        const seconds = time.split(':')[2];
+        return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
+    }
+
     static setSenderName(senderName){
         localStorage.setItem('senderName', senderName);
     }
 
     static getSenderName(){
         return localStorage.getItem('senderName');
+    }
+
+    static setVolume(volume){
+        localStorage.setItem('volume', volume);
+    }
+
+    static getVolume(){
+        return localStorage.getItem('volume') || 0.8;
     }
 }
 

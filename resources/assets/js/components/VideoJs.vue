@@ -214,21 +214,14 @@
                 //重新加载弹幕
                 this.barrageList = [];
                 this.finalBarrageList.forEach(item =>{
-                    if(this.timeToSecond(item.time) - 2 > progress){
+                    if(Tools.timeToSecond(item.time) - 2 > progress){
                         this.barrageList.push(item);
                     }
                 });
                 this.currentBarrage = this.barrageList.shift();
             },
-            timeToSecond:function(time){
-                if(!time) return;
-                const hours = time.split(':')[0];
-                const minutes = time.split(':')[1];
-                const seconds = time.split(':')[2];
-                return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
-            },
             loadBarrages:function(){
-                const barrageTime = this.timeToSecond(this.currentBarrage.time);
+                const barrageTime = Tools.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
                     this.$refs.barrage.shoot({
                         content:this.currentBarrage.content,
@@ -243,20 +236,5 @@
 </script>
 
 <style scoped>
-    .player-container {
-        display: flex;
-    }
 
-    .barrage-container {
-        flex: 1 0 auto;
-        width: 100%;
-        height: 640px;
-    }
-
-    .video {
-        display: flex;
-        justify-content: center;
-        width: 400px;
-        height: 640px;
-    }
 </style>

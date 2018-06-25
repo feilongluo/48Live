@@ -35,11 +35,11 @@
                         <div class="barrage-input-box" v-if="!isReview">
                             <Poptip trigger="hover" title="发送者名称">
                                 <div slot="content">
-                                        <p>第一次发送弹幕后将变为只读</p>
-                                        <p>刷新页面后可再次更改</p>
-                                        <p>请勿滥用</p>
-                                        <p>请勿Diss小偶像</p>
-                                        <p>请勿Ky</p>
+                                    <p>第一次发送弹幕后将变为只读</p>
+                                    <p>刷新页面后可再次更改</p>
+                                    <p>请勿滥用</p>
+                                    <p>请勿diss小偶像</p>
+                                    <p>请勿ky</p>
                                 </div>
                                 <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
                             </Poptip>
@@ -72,7 +72,7 @@
 
     const SENDER_ID = '' + new Date().getTime() + Math.round(Math.random() * 10);   //发送者id
 
-    const BARRAGE_SEND_INTERVAL = 20;   //弹幕发送间隔
+    const BARRAGE_SEND_INTERVAL = 5;   //弹幕发送间隔
 
     export default {
         name:'FlvJs',
@@ -93,7 +93,7 @@
                 duration:0,
                 currentTime:0,
                 isReview:true,      //是否回放
-                volume:0,
+                volume:Tools.getVolume(),
                 currentBarrage:{},
                 finalBarrageList:[],
                 barrageList:[],
@@ -140,7 +140,7 @@
                         this.isRadio = res.data.data.liveType == 2;
                         this.member = new Member(res.data.data.memberId);
 
-                        this.senderName = Tools.getSenderName() ||this.member.name + '的小粉丝';
+                        this.senderName = Tools.getSenderName() || this.member.name + '的小粉丝';
 
                         this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
@@ -252,7 +252,7 @@
                 //重新加载弹幕
                 this.barrageList = [];
                 this.finalBarrageList.forEach(item =>{
-                    if(this.timeToSecond(item.time) - 2 > progress){
+                    if(Tools.timeToSecond(item.time) - 2 > progress){
                         this.barrageList.push(item);
                     }
                 });
@@ -261,15 +261,8 @@
             volumeChange:function(volume){
                 this.volume = volume;
             },
-            timeToSecond:function(time){
-                if(!time) return;
-                const hours = time.split(':')[0];
-                const minutes = time.split(':')[1];
-                const seconds = time.split(':')[2];
-                return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
-            },
             loadBarrages:function(){
-                const barrageTime = this.timeToSecond(this.currentBarrage.time);
+                const barrageTime = Tools.timeToSecond(this.currentBarrage.time);
                 if(barrageTime > this.currentTime - 1 && barrageTime < this.currentTime + 1){ //弹幕可误差1秒
                     this.$refs.barrage.shoot({
                         content:this.currentBarrage.content,
@@ -284,22 +277,31 @@
                     return;
                 }
                 const custom = {
-                    senderId:SENDER_ID,
-                    senderName:this.senderName,
-                    username:this.senderName,
-                    senderLevel:3,
-                    senderAvatar:'',
-                    senderRole:0,
-                    source:'member_live',
                     sourceId:this.$route.params.liveId,
-                    content:this.content,
+                    preLiveTime:0,
+                    source:'member_live',
+                    chatType:1,
+                    senderLevel:'3',
+                    fromApp:2,
+                    isBarrage:0,
                     contentType:1,
+                    senderId:SENDER_ID,
+                    senderRole:0,
+                    content:this.content,
+                    senderName:this.senderName,
+                    isGuardMan:0,
+                    senderAvatar:'',
                     platform:'android',
-                    isBarrage:0
+                    liveStartTime:'',
+                    text:this.content,
+                    senderHonor:';'
+
                 };
                 const message = {
                     text:this.content,
                     custom:JSON.stringify(custom),
+                    type:'text',
+                    chatroomId:this.roomId,
                     done:(error) =>{
                         if(error == null){
                             this.$refs.barrage.shoot({
@@ -330,44 +332,45 @@
             //连接聊天室
             connectChatroom:function(){
                 const options = {
-                        roomId:this.roomId,
-                        onConnect:() =>{
-                            this.$Notice.success({
-                                title:'聊天室连接成功',
-                                desc:''
-                            });
-                        },
-                        onDisconnect:(message) =>{
-                            this.$Notice.success({
-                                title:'聊天室连接断开',
-                                desc:''
-                            });
-                            console.log(message);
-                        },
-                        onWillConnect:() =>{
+                    roomId:this.roomId,
+                    onConnect:() =>{
+                        this.$Notice.success({
+                            title:'聊天室连接成功',
+                            desc:''
+                        });
+                    },
+                    onDisconnect:(message) =>{
+                        this.$Notice.success({
+                            title:'聊天室连接断开',
+                            desc:''
+                        });
+                        console.log(message);
+                    },
+                    onWillConnect:() =>{
 
-                        },
-                        /**
-                         * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
-                         */
-                        onMessage:messages =>{
-                            messages.forEach(message =>{
-                                if(message.type == 'text'){
-                                    const custom = JSON.parse(message.custom);
-                                    const level = custom.isBarrage ? 2 : 1;
-                                    if(custom.contentType == 1){
-                                        this.$refs.barrage.shoot({
-                                            content:custom.content,
-                                            username:custom.senderName,
-                                            level:level
-                                        });
-                                    }
+                    },
+                    /**
+                     * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
+                     */
+                    onMessage:messages =>{
+                        messages.forEach(message =>{
+                            if(message.type == 'text'){
+                                const custom = JSON.parse(message.custom);
+                                const level = custom.isBarrage ? 2 : 1;
+                                if(custom.contentType == 1){
+                                    this.$refs.barrage.shoot({
+                                        content:custom.content,
+                                        username:custom.senderName,
+                                        level:level
+                                    });
                                 }
-                            });
-                        },
-                        onError:error =>{
-                            console.log(error);
-                        }
+                                console.log(message);
+                            }
+                        });
+                    },
+                    onError:error =>{
+                        console.log(error);
+                    }
                 };
                 Tools.chatroom(options).then(chatroom =>{
                     this.chatroom = chatroom;
@@ -384,11 +387,6 @@
 </script>
 
 <style scoped>
-    .video {
-        width: 400px;
-        height: 640px;
-    }
-
     .barrage-input-box {
         display: flex;
         align-items: flex-end;

@@ -171,8 +171,8 @@
 
                         this.reviewTotal = this.reviewList.length;
 
-                        this.onLivePageChange(this.livePage);
-                        this.onReviewPageChange(this.reviewPage);
+                        this.onLivePageChange(1);
+                        this.onReviewPageChange(1);
                         this.spinShow = false;
                     }else{
                         console.log(res.data.msg);

@@ -53,6 +53,13 @@ div[id^="vjs_video_"] {
   display: flex;
 }
 
+.video {
+  display: flex;
+  justify-content: center;
+  width: 400px;
+  height: 640px;
+}
+
 .barrage-container {
   flex: 1 0 auto;
   width: 100%;
