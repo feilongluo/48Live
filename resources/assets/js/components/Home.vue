@@ -215,17 +215,6 @@
         text-align: center;
     }
 
-    .team-badge {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        min-width: 32px;
-        padding: 0 4px;
-        border-radius: 24px;
-        color: white;
-        font-size: 12px;
-    }
-
     .cascader {
         display: inline-flex;
         min-width: 240px;

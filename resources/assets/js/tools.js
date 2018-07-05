@@ -48,29 +48,49 @@ class Tools {
      * @returns {Promise<any>}
      */
     static chatroom(options){
-        return new Promise((resolve, reject) =>{
-            axios.get('/api/token').then(response =>{
-                const chatroom = new Chatroom({
-                    appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
-                    account:response.data.data.account,
-                    token:response.data.data.token,
-                    chatroomId:options.roomId,
-                    chatroomAddresses:[
-                        'weblink04.netease.im:443',
-                        /*'',*/
-                    ],
-                    onconnect:options.onConnect,
-                    onerror:options.onError,
-                    onwillreconnect:options.onWillConnnect,
-                    ondisconnect:options.onDisconnect,
-                    // // 消息
-                    onmsgs:options.onMessage
+        if(!this.getChatroomToken()){
+            return new Promise((resolve, reject) =>{
+                axios.get('/api/token').then(response =>{
+                    this.setChatroomToken(response.data.token);
+                    options.token = response.data.token;
+                    resolve(this.connect(options));
+                }).catch(error =>{
+                    reject(error);
                 });
-                resolve(chatroom);
-            }).catch(error =>{
-                reject(error);
             });
+        }else{
+            return new Promise((resolve, reject) =>{
+                options.token = this.getChatroomToken();
+                resolve(this.connect(options));
+            });
+        }
+    }
+
+    static connect(options){
+        return new Chatroom({
+            appKey:'632feff1f4c838541ab75195d1ceb3fa',      //从官网公演直播网页代码获取
+            account:options.token,
+            token:options.token,
+            chatroomId:options.roomId,
+            chatroomAddresses:[
+                'weblink04.netease.im:443',
+                /*'',*/
+            ],
+            onconnect:options.onConnect,
+            onerror:options.onError,
+            onwillreconnect:options.onWillConnnect,
+            ondisconnect:options.onDisconnect,
+            // // 消息
+            onmsgs:options.onMessage
         });
+    }
+
+    static setChatroomToken(token){
+        localStorage.setItem('token', token);
+    }
+
+    static getChatroomToken(){
+        return localStorage.getItem('token');
     }
 
     static timeToSecond(time){

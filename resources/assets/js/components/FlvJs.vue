@@ -1,14 +1,20 @@
 <template>
     <div class="layout">
         <Layout>
-            <player-header :other-player="'/videojs/' + liveId" :video-url="streamPath"></player-header>
+            <PlayerHeader :other-player="'/videojs/' + liveId" :video-url="streamPath"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
 
                     <Card>
                         <p slot="title">{{subTitle}}</p>
-                        <p slot="extra">{{title}}</p>
+                        <p slot="extra">
+                            <span>{{title}}</span>
+                            <span class="team-badge"
+                                    :style="{'background-color':member.team.color}">
+                                {{member.team.name}}
+                            </span>
+                        </p>
 
                         <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
                             <CarouselItem v-for="picture in pictures" :key="picture">
@@ -18,39 +24,38 @@
 
                         <video class="video" id="liveVideo" ref="video" v-else></video>
 
-                        <player-controls ref="controls" :show-play-button="isReview" :is-muted="isMuted"
+                        <PlayerControls ref="controls" :show-play-button="isReview" :is-muted="isMuted"
                                 :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="volumeChange"
                                 :current-time="currentTime"
-                                :duration="duration"></player-controls>
+                                :duration="duration"></PlayerControls>
                     </Card>
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
 
-                        <barrage ref="barrage" class="barrage-container"></barrage>
+                        <Barrage ref="barrage" class="barrage-container"></Barrage>
+                            <div class="barrage-input-box">
+                                <Poptip trigger="hover" title="发送者名称">
+                                    <div slot="content">
+                                        <p>第一次发送弹幕后将变为只读</p>
+                                        <p>刷新页面后可再次更改</p>
+                                        <p>请勿滥用</p>
+                                        <p>请勿diss小偶像</p>
+                                        <p>请勿ky</p>
+                                    </div>
+                                    <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
+                                </Poptip>
 
-                        <div class="barrage-input-box" v-if="!isReview">
-                            <Poptip trigger="hover" title="发送者名称">
-                                <div slot="content">
-                                    <p>第一次发送弹幕后将变为只读</p>
-                                    <p>刷新页面后可再次更改</p>
-                                    <p>请勿滥用</p>
-                                    <p>请勿diss小偶像</p>
-                                    <p>请勿ky</p>
-                                </div>
-                                <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
-                            </Poptip>
+                                <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
+                                        @on-enter="sendBarrage"/>
 
-                            <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
-                                    @on-enter="sendBarrage"/>
-
-                            <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
-                                    :disabled="sendDisabled">
-                                {{sendText}}
-                            </Button>
+                                <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
+                                        :disabled="sendDisabled">
+                                    {{sendText}}
+                                </Button>
                         </div>
                     </Card>
                 </div>
@@ -79,7 +84,11 @@
         components:{Casitem, Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
-                member:{},
+                member:{
+                    team:{
+                        color:'inherit'
+                    }
+                },
                 spinShow:true,
                 liveId:'',
                 streamPath:'',
@@ -100,7 +109,6 @@
                 roomId:'',
                 isRadio:false,
                 pictures:[],
-                pictureIndex:0,
                 content:'',
                 senderName:'',
                 senderNameReadonly:false,

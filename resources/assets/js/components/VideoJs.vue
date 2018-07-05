@@ -1,7 +1,7 @@
 <template>
     <div class="layout">
         <Layout>
-            <player-header :other-player="'/flvjs/' + liveId" :video-url="streamPath"></player-header>
+            <PlayerHeader :other-player="'/flvjs/' + liveId" :video-url="streamPath"></PlayerHeader>
             <Content style="padding: 16px;">
                 <div class="player-container">
                     <Spin size="large" fix v-if="spinShow"></Spin>
@@ -16,19 +16,19 @@
                             </CarouselItem>
                         </Carousel>
 
-                        <video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>
+                        <VideoPlayer ref="videoPlayer" class="video" :options="playerOptions" v-else></VideoPlayer>
 
-                        <player-controls ref="controls" :is-muted="isMuted" :show-progress="isReview"
+                        <PlayerControls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
                                 @play="play" @pause="pause" @mute="mute" @unmute="unmute" @progress="progressChange"
                                 @volume="onVolumeChange"
                                 :current-time="currentTime"
-                                :duration="duration"></player-controls>
+                                :duration="duration"></PlayerControls>
                     </Card>
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
-                        <barrage class="barrage-container" ref="barrage"></barrage>
+                        <Barrage class="barrage-container" ref="barrage"></Barrage>
                     </Card>
                 </div>
             </Content>
