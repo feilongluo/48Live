@@ -37,25 +37,25 @@
                         <p slot="title">弹幕</p>
 
                         <Barrage ref="barrage" class="barrage-container"></Barrage>
-                            <div class="barrage-input-box">
-                                <Poptip trigger="hover" title="发送者名称">
-                                    <div slot="content">
-                                        <p>第一次发送弹幕后将变为只读</p>
-                                        <p>刷新页面后可再次更改</p>
-                                        <p>请勿滥用</p>
-                                        <p>请勿diss小偶像</p>
-                                        <p>请勿ky</p>
-                                    </div>
-                                    <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
-                                </Poptip>
+                        <div class="barrage-input-box" v-if="!isReview">
+                            <Poptip trigger="hover" title="发送者名称">
+                                <div slot="content">
+                                    <p>第一次发送弹幕后将变为只读</p>
+                                    <p>刷新页面后可再次更改</p>
+                                    <p>请勿滥用</p>
+                                    <p>请勿diss小偶像</p>
+                                    <p>请勿ky</p>
+                                </div>
+                                <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
+                            </Poptip>
 
-                                <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
-                                        @on-enter="sendBarrage"/>
+                            <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
+                                    @on-enter="sendBarrage"/>
 
-                                <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
-                                        :disabled="sendDisabled">
-                                    {{sendText}}
-                                </Button>
+                            <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
+                                    :disabled="sendDisabled">
+                                {{sendText}}
+                            </Button>
                         </div>
                     </Card>
                 </div>
