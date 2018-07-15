@@ -16,7 +16,7 @@
                             </CarouselItem>
                         </Carousel>
 
-                        <VideoPlayer ref="videoPlayer" class="video" :options="playerOptions" v-else></VideoPlayer>
+                        <video-player ref="videoPlayer" class="video" :options="playerOptions" v-else></video-player>
 
                         <PlayerControls ref="controls" :is-muted="isMuted" :show-progress="isReview"
                                 :is-playing="isPlaying" :volume-disabled="volumeDisabled"
