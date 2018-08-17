@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>口袋48成员直播</title>
+    <meta name="description" content="口袋48网页版,口袋48电脑版">
+    <meta name="keywords" content="口袋48网页版,口袋48电脑版">
 
     <link rel="stylesheet" href="{{asset('css/app.css')}}?v={{str_random()}}">
 </head>

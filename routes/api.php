@@ -22,3 +22,7 @@ Route::get('/live/{liveId}', 'LiveController@show');
 Route::get('/barrage', 'LiveController@barrage');
 
 Route::get('/token', 'LiveController@token');
+
+Route::get('/members', 'MemberController@all');
+
+Route::get('/teams', 'TeamController@all');

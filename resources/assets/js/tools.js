@@ -73,6 +73,29 @@ class Tools {
         });
     }
 
+    static getMembers(){
+        return new Promise((resolve, reject) =>{
+            axios.get('/api/members').then(res =>{
+                const members = res.data.data;
+                resolve(members);
+            }).catch(error =>{
+                reject(error);
+            });
+        });
+
+    }
+
+    static getTeams(){
+        return new Promise((resolve, reject) =>{
+            axios.get('/api/teams').then(res =>{
+                const members = res.data.data;
+                resolve(members);
+            }).catch(error =>{
+                reject(error);
+            });
+        });
+    }
+
     static timeToSecond(time){
         if(!time) return;
         const hours = time.split(':')[0];

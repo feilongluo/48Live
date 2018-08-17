@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -20,6 +21,10 @@ class LiveController extends Controller{
 
 	const URL_CHATROOM_TOKEN = 'http://zhibo.ckg48.com/Server/do_ajax_setcookie';
 
+	/**
+	 * 获取直播列表
+	 * @return array
+	 */
 	public function list(){
 		$body = [
 			'lastTime' => '0',
@@ -43,6 +48,11 @@ class LiveController extends Controller{
 		return $this->success($data);
 	}
 
+	/**
+	 * 获取单个直播
+	 * @param $liveId
+	 * @return array
+	 */
 	public function show($liveId){
 		$body = [
 			'type' => '1',
@@ -61,6 +71,10 @@ class LiveController extends Controller{
 		return $this->success($data);
 	}
 
+	/**
+	 * 获取弹幕
+	 * @return array
+	 */
 	public function barrage(){
 		$url = $this->request->barrageUrl;
 		if(!$url){
@@ -96,6 +110,10 @@ class LiveController extends Controller{
 		}
 	}
 
+	/**
+	 * 获取聊天室token
+	 * @return array
+	 */
 	public function token(){
 		$body = [
 			'timestamp' => time(),
@@ -123,17 +141,14 @@ class LiveController extends Controller{
 		}
 	}
 
+
 	/**
 	 * 生成随机cookie_val，用于未登录获取token
 	 * @param int $length
 	 * @return string
 	 */
 	private function randomString($length = 32){
-		$chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz012345678_@';
-		$password = '';
-		for($i = 0; $i < $length; $i++){
-			$password .= substr($chars, random_int(0, strlen($chars) - 1), 1);
-		}
+		$password = str_random($length);
 		return '48web' . $password;
 	}
 
