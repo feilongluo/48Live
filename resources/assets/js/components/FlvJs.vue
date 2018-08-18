@@ -10,10 +10,6 @@
                         <p slot="title">{{subTitle}}</p>
                         <p slot="extra">
                             <span>{{title}}</span>
-                            <span class="team-badge"
-                                    :style="{'background-color':member.team.color}">
-                                {{member.team.name}}
-                            </span>
                         </p>
 
                         <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
@@ -70,7 +66,6 @@
     import Barrage from "./Barrage";
     import Casitem from "iview/src/components/cascader/casitem";
     import Tools from "../tools";
-    import {Member} from "../48infos";
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
@@ -84,11 +79,6 @@
         components:{Casitem, Barrage, PlayerControls, PlayerHeader},
         data(){
             return {
-                member:{
-                    team:{
-                        color:'inherit'
-                    }
-                },
                 spinShow:true,
                 liveId:'',
                 streamPath:'',
@@ -146,7 +136,6 @@
                         this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
                         this.roomId = res.data.data.roomId;
                         this.isRadio = res.data.data.liveType == 2;
-                        this.member = new Member(res.data.data.memberId);
 
                         this.senderName = Tools.getSenderName() || this.member.name + '的小粉丝';
 
@@ -289,7 +278,7 @@
                     preLiveTime:0,
                     source:'member_live',
                     chatType:1,
-                    senderLevel:'3',
+                    senderLevel:'' + Math.floor(Math.random()*(6 - 1 + 1) + 1),
                     fromApp:2,
                     isBarrage:0,
                     contentType:1,

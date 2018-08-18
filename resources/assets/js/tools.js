@@ -25,6 +25,7 @@ import './48sdk/nim-v2.8.0';
 import axios from 'axios';
 import Chatroom from './48sdk/chatroom-v2.8.0';
 
+
 class Tools {
     /**
      *
@@ -73,26 +74,18 @@ class Tools {
         });
     }
 
-    static getMembers(){
+    static getInfo(){
         return new Promise((resolve, reject) =>{
-            axios.get('/api/members').then(res =>{
-                const members = res.data.data;
-                resolve(members);
-            }).catch(error =>{
-                reject(error);
-            });
-        });
-
-    }
-
-    static getTeams(){
-        return new Promise((resolve, reject) =>{
-            axios.get('/api/teams').then(res =>{
-                const members = res.data.data;
-                resolve(members);
-            }).catch(error =>{
-                reject(error);
-            });
+            if(Tools.info == null){
+                axios.get('/api/info').then(res =>{
+                    Tools.info = res.data.data;
+                    resolve(Tools.info);
+                }).catch(error =>{
+                    reject(error);
+                });
+            }else{
+                resolve(Tools.info);
+            }
         });
     }
 
@@ -120,5 +113,7 @@ class Tools {
         return localStorage.getItem('volume') || 0.8;
     }
 }
+
+Tools.info = null;
 
 export default Tools;

@@ -36,9 +36,10 @@
                                                 <p style="color:#ccc;">{{item.date}}</p>
                                                 <div style="display: flex;justify-content: space-between;">
                                                     <div>
-                                                        <span style="color: #000;">{{item.member.name}}</span>
+                                                        <span style="color: #000;">{{item.member_name}}</span>
                                                         <span class="team-badge"
-                                                                :style="{'background-color':item.member.team.color}">{{item.member.team.name}}</span>
+                                                                :style="{'background-color':'#' + item.team.color}">{{item
+                                                            .team.team_name}}</span>
                                                     </div>
                                                     <span v-if="item.liveType == 1">直播</span>
                                                     <span v-else>电台</span>
@@ -65,9 +66,10 @@
                                                 <p style="color:#ccc;">{{item.date}}</p>
                                                 <div style="display: flex;justify-content: space-between;">
                                                     <div>
-                                                        <span style="color: #000;">{{item.member.name}}</span>
+                                                        <span style="color: #000;">{{item.member_name}}</span>
                                                         <span class="team-badge"
-                                                                :style="{'background-color':item.member.team.color}">{{item.member.team.name}}</span>
+                                                                :style="{'background-color':'#' + item.team.color}">
+                                                            {{item.team.team_name}}</span>
                                                     </div>
                                                     <span v-if="item.liveType == 1">直播</span>
                                                     <span v-else>电台</span>
@@ -90,7 +92,6 @@
 </template>
 
 <script>
-    import {groups, Member} from '../48infos';
     import Tools from "../tools";
 
     export default {
@@ -116,23 +117,25 @@
         created:function(){
             this.getList();
 
-            this.members = groups.map(group =>{
-                return {
-                    value:group.id,
-                    label:group.name,
-                    children:group.teams.map(team =>{
-                        return {
-                            value:team.id,
-                            label:team.fullname,
-                            children:team.members().map(member =>{
-                                return {
-                                    value:member.id,
-                                    label:member.name
-                                }
-                            })
-                        }
-                    })
-                };
+            Tools.getInfo().then(info =>{
+                this.members = info.groups.map(group =>{
+                    return {
+                        value:group.group_id,
+                        label:group.group_name,
+                        children:group.teams.map(team =>{
+                            return {
+                                value:team.team_id,
+                                label:team.team_name,
+                                children:team.members.map(member =>{
+                                    return {
+                                        value:member.member_id,
+                                        label:member.real_name
+                                    }
+                                })
+                            }
+                        })
+                    }
+                });
             });
         },
         updated:function(){
@@ -156,16 +159,16 @@
                     if(res.data.errorCode == 0){
                         this.liveList = res.data.data.liveList.map(item =>{
                             item.cover = Tools.pictureUrls(item.picPath)[0];
-                            item.member = new Member(item.memberId);
                             item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
+                            item.team.team_name = item.team.team_name.replace('TEAM ', '');
                             return item;
                         });
                         this.liveTotal = this.liveList.length;
 
                         this.reviewList = res.data.data.reviewList.map(item =>{
                             item.cover = Tools.pictureUrls(item.picPath)[0];
-                            item.member = new Member(item.memberId);
                             item.date = new Date(item.startTime).format('yyyy-MM-dd hh:mm');
+                            item.team.team_name = item.team.team_name.replace('TEAM ', '');
                             return item;
                         });
 

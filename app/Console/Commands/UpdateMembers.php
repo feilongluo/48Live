@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Group;
 use App\Models\Member;
 use App\Models\Team;
 use GuzzleHttp\Client;
@@ -102,6 +103,22 @@ class UpdateMembers extends Command{
 				Team::query()->truncate();
 				Team::query()->insert($insertData);
 			}
+
+			$groups = $result['content']['group'];
+			if(is_array($groups) && !empty($groups)){
+				$insertData = [];
+				foreach($groups as $group){
+					$insertData[] = [
+						'group_id' => $group['group_id'],
+						'group_name' => $group['group_name'],
+						'created_at' => date('Y-m-d H:i:s'),
+						'updated_at' => date('Y-m-d H:i:s')
+					];
+				}
+				Group::query()->truncate();
+				Group::query()->insert($insertData);
+			}
+
 		}catch(GuzzleException $e){
 			\Log::debug($e->getMessage());
 		}

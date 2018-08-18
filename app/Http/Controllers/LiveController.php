@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\Team;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -40,9 +41,39 @@ class LiveController extends Controller{
 			return $this->failed('请求失败');
 		}
 
+		$members = Member::query()->select(['member_id', 'real_name', 'team_id'])->get()->toArray();
+		$teams = Team::query()->select(['team_id', 'team_name', 'color', 'group_id'])->get()->toArray();
+
+		$liveList = $result['content']['liveList'];
+		foreach($liveList as $key => $live){
+			$member = array_first($members, function($value, $index) use ($live){
+				return $live['memberId'] == $value['member_id'];
+			});
+			$live['member_name'] = $member['real_name'];
+
+			$live['team'] = array_first($teams, function($value, $index) use ($member){
+				return $member['team_id'] == $value['team_id'];
+			});
+
+			$liveList[$key] = $live;
+		}
+
+		$reviewList = $result['content']['reviewList'];
+		foreach($reviewList as $key => $review){
+			$member = array_first($members, function($value, $index) use ($review){
+				return $review['memberId'] == $value['member_id'];
+			});
+			$review['member_name'] = $member['real_name'];
+
+			$review['team'] = array_first($teams, function($value, $index) use ($member){
+				return $member['team_id'] == $value['team_id'];
+			});
+			$reviewList[$key] = $review;
+		}
+
 		$data = [
-			'liveList' => $result['content']['liveList'],
-			'reviewList' => $result['content']['reviewList'],
+			'liveList' => $liveList,
+			'reviewList' => $reviewList,
 		];
 
 		return $this->success($data);
