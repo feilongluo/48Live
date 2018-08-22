@@ -99,6 +99,11 @@ class LiveController extends Controller{
 
 		$data = $result['content'];
 
+		$data['member'] = Member::query()->where('member_id', $data['memberId'])->select([
+				'member_id',
+				'real_name',
+				'team_id'
+			])->first()->toArray();
 		return $this->success($data);
 	}
 
