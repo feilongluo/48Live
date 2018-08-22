@@ -1,6 +1,6 @@
 # 48Live
 
-## 预览：[http://48live.emotions.ml](http://48live.emotions.ml)
+## 预览：[http://48live.jarvay.cn](http://48live.jarvay.cn)
    目前只在Chrome下测试通过
 
 ## 项目参考 [pocket48-grab](https://github.com/xsaiting/pocket48-grab/)
