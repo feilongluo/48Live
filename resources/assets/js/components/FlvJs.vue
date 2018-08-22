@@ -137,7 +137,7 @@
                         this.roomId = res.data.data.roomId;
                         this.isRadio = res.data.data.liveType == 2;
 
-                        this.senderName = Tools.getSenderName() || this.member.name + '的小粉丝';
+                        this.senderName = Tools.getSenderName() || '超绝可爱' + res.data.data.member.real_name;
 
                         this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
@@ -278,7 +278,7 @@
                     preLiveTime:0,
                     source:'member_live',
                     chatType:1,
-                    senderLevel:'' + Math.floor(Math.random()*(6 - 1 + 1) + 1),
+                    senderLevel:'' + Math.floor(Math.random() * (6 - 1 + 1) + 1),
                     fromApp:2,
                     isBarrage:0,
                     contentType:1,
