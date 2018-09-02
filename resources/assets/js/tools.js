@@ -57,6 +57,7 @@ class Tools {
                     token:response.data.data.token,
                     chatroomId:options.roomId,
                     chatroomAddresses:[
+                        // '127.0.0.1:7272',
                         'weblink04.netease.im:443',
                         /*'',*/
                     ],
@@ -103,6 +104,14 @@ class Tools {
 
     static getSenderName(){
         return localStorage.getItem('senderName');
+    }
+
+    static setSenderId(senderId){
+        localStorage.setItem('senderId', parseInt(senderId));
+    }
+
+    static getSenderId(){
+        return localStorage.getItem('senderId');
     }
 
     static setVolume(volume){

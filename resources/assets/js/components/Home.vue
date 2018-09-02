@@ -139,8 +139,10 @@
             });
         },
         updated:function(){
-            if(this.coverWidth == -1 && this.$refs.cover){
-                this.coverWidth = this.$refs.cover[0].offsetWidth;
+            if(this.$refs.cover){
+                if(this.coverWidth == -1){
+                    this.coverWidth = this.$refs.cover[0].offsetWidth;
+                }
 
                 this.$refs.cover.forEach(item =>{
                     item.style.height = this.coverWidth + 'px';
