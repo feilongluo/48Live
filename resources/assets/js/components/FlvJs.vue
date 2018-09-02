@@ -42,7 +42,8 @@
                                     <p>请勿diss小偶像</p>
                                     <p>请勿ky</p>
                                 </div>
-                                <Input v-model="senderName" placeholder="发送者名称" :readonly="senderNameReadonly"/>
+                                <Input style="width:160px;" v-model="senderName" placeholder="发送者名称"
+                                        :readonly="senderNameReadonly"/>
                             </Poptip>
 
                             <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
@@ -57,6 +58,11 @@
                 </div>
             </Content>
         </Layout>
+
+        <Modal v-model="endTipsShow"
+                title="提示">
+            <p>直播结束</p>
+        </Modal>
     </div>
 </template>
 
@@ -69,8 +75,6 @@
 
     const STATUS_PLAYING = 1;
     const STATUS_PREPARED = 0;
-
-    const SENDER_ID = '' + new Date().getTime() + Math.round(Math.random() * 10);   //发送者id
 
     const BARRAGE_SEND_INTERVAL = 5;   //弹幕发送间隔
 
@@ -106,6 +110,7 @@
                 sendText:'发送',
                 seconds:BARRAGE_SEND_INTERVAL,
                 chatroom:null,
+                endTipsShow:false,
             }
         },
         computed:{
@@ -279,10 +284,10 @@
                     source:'member_live',
                     chatType:1,
                     senderLevel:'' + Math.floor(Math.random() * (6 - 1 + 1) + 1),
+                    senderId:undefined,
                     fromApp:2,
                     isBarrage:0,
                     contentType:1,
-                    senderId:SENDER_ID,
                     senderRole:0,
                     content:this.content,
                     senderName:this.senderName,
@@ -353,13 +358,23 @@
                         messages.forEach(message =>{
                             if(message.type == 'text'){
                                 const custom = JSON.parse(message.custom);
-                                const level = custom.isBarrage ? 2 : 1;
-                                if(custom.contentType == 1){
-                                    this.$refs.barrage.shoot({
-                                        content:custom.content,
-                                        username:custom.senderName,
-                                        level:level
-                                    });
+                                let level = custom.isBarrage ? 2 : 1;
+                                if(custom.senderRole == 1){
+                                    level = 2;
+                                }
+                                switch(custom.contentType){
+                                    case 1: //弹幕消息
+                                        this.$refs.barrage.shoot({
+                                            content:custom.content,
+                                            username:custom.senderName,
+                                            level:level
+                                        });
+                                        break;
+                                    case 8:
+                                        if(custom.content.liveStatus == 2){ //直播结束
+                                            this.endShow = true;
+                                        }
+                                        break;
                                 }
                                 console.log(message);
                             }
