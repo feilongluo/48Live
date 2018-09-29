@@ -11,7 +11,7 @@
                         <p slot="extra">{{title}}</p>
 
                         <Carousel class="video" v-if="isRadio" autoplay loop :autoplay-speed="8000">
-                            <CarouselItem  v-for="picture in pictures" :key="picture">
+                            <CarouselItem v-for="picture in pictures" :key="picture">
                                 <img class="picture" :src="picture">
                             </CarouselItem>
                         </Carousel>
@@ -28,7 +28,11 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
-                        <Barrage class="barrage-container" ref="barrage"></Barrage>
+                        <p slot="extra">观看人数：{{number}}</p>
+
+                        <div class="barrage-container">
+                            <Barrage class="barrage-box" ref="barrage"></Barrage>
+                        </div>
                     </Card>
                 </div>
             </Content>
@@ -81,6 +85,7 @@
                 barrageList:[],
                 isRadio:false,
                 pictures:[],
+                number:0,
             }
         },
         computed:{
@@ -108,14 +113,16 @@
         },
         methods:{
             getOne:function(){
-                axios.get('/api/live/' + this.liveId).then(res =>{
+                axios.get('/api/live/' + this.liveId).then(res => {
                     if(res.data.errorCode == 0){
-                        this.streamPath = res.data.data.streamPath;
-                        this.title = res.data.data.title;
-                        this.subTitle = res.data.data.subTitle;
-                        this.isReview = res.data.data.isReview;
-                        this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
-                        this.isRadio = res.data.data.liveType == 2;
+                        const data = res.data.data;
+                        this.streamPath = data.streamPath;
+                        this.title = data.title;
+                        this.subTitle = data.subTitle;
+                        this.isReview = data.isReview;
+                        this.barrageUrl = 'http://source.48.cn' + data.lrcPath;
+                        this.isRadio = data.liveType == 2;
+                        this.number = data.number;
 
                         this.pictures = Tools.pictureUrls(res.data.data.picPath);
 
@@ -126,7 +133,7 @@
                             src:this.streamPath
                         });
                         //时长
-                        this.player.on('loadeddata', event =>{
+                        this.player.on('loadeddata', event => {
                             this.duration = event.target.player.duration();
 
                             if(this.isReview){
@@ -134,13 +141,13 @@
                             }
                         });
                         //当前进度
-                        this.player.on('timeupdate', event =>{
+                        this.player.on('timeupdate', event => {
                             this.currentTime = event.target.player.currentTime();
                             //弹幕
                             this.loadBarrages();
                         });
                         //播放结束
-                        this.player.on('ended', () =>{
+                        this.player.on('ended', () => {
                             this.status = STATUS_PREPARED;
                             this.$Notice.info({
                                 title:'播放完毕',
@@ -151,7 +158,7 @@
                     }else{
                         this.$Notice.error(res.data.msg);
                     }
-                }).catch(error =>{
+                }).catch(error => {
                     this.spinShow = false;
                     console.log(error);
                 });
@@ -161,7 +168,7 @@
                     params:{
                         barrageUrl:this.barrageUrl
                     }
-                }).then(res =>{
+                }).then(res => {
                     if(res.data.errorCode == 0){
                         this.finalBarrageList = this.barrageList = res.data.data.barrages;
                         this.currentBarrage = this.barrageList.shift();
@@ -176,7 +183,7 @@
                             desc:''
                         });
                     }
-                }).catch(error =>{
+                }).catch(error => {
                     this.$Notice.error('弹幕加载失败');
                     console.log(error);
                 });
@@ -213,7 +220,7 @@
                 this.player.currentTime(progress);
                 //重新加载弹幕
                 this.barrageList = [];
-                this.finalBarrageList.forEach(item =>{
+                this.finalBarrageList.forEach(item => {
                     if(Tools.timeToSecond(item.time) - 2 > progress){
                         this.barrageList.push(item);
                     }
