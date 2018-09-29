@@ -86,7 +86,7 @@
                     </div>
                 </Card>
             </Content>
-            <Footer class="layout-footer-center">2018 &copy; 超绝可爱黄婷婷</Footer>
+            <Footer class="layout-footer-center">2018 &copy; Jarvay  超绝可爱黄婷婷</Footer>
         </Layout>
     </div>
 </template>

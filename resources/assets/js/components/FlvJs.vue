@@ -31,29 +31,34 @@
 
                     <Card style="flex: 1 0 auto;margin-left: 16px;">
                         <p slot="title">弹幕</p>
+                        <p slot="extra">观看人数：{{number}}</p>
 
-                        <Barrage ref="barrage" class="barrage-container"></Barrage>
-                        <div class="barrage-input-box" v-if="!isReview">
-                            <Poptip trigger="hover" title="发送者名称">
-                                <div slot="content">
-                                    <p>第一次发送弹幕后将变为只读</p>
-                                    <p>刷新页面后可再次更改</p>
-                                    <p>请勿滥用</p>
-                                    <p>请勿diss小偶像</p>
-                                    <p>请勿ky</p>
-                                </div>
-                                <Input style="width:160px;" v-model="senderName" placeholder="发送者名称"
-                                        :readonly="senderNameReadonly"/>
-                            </Poptip>
+                        <div class="barrage-container">
+                            <Barrage ref="barrage" class="barrage-box"></Barrage>
 
-                            <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
-                                    @on-enter="sendBarrage"/>
+                            <div class="barrage-input-box" v-if="!isReview">
+                                <Poptip trigger="hover" title="发送者名称" style="margin-left:8px;">
+                                    <div slot="content">
+                                        <p>第一次发送弹幕后将变为只读</p>
+                                        <p>刷新页面后可再次更改</p>
+                                        <p>请勿滥用</p>
+                                        <p>请勿diss小偶像</p>
+                                        <p>请勿ky</p>
+                                    </div>
+                                    <Input style="width:160px;" v-model="senderName" placeholder="发送者名称"
+                                            :readonly="senderNameReadonly"/>
+                                </Poptip>
 
-                            <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
-                                    :disabled="sendDisabled">
-                                {{sendText}}
-                            </Button>
+                                <Input v-model="content" placeholder="请填写弹幕内容" style="margin-left: 8px;" clearable
+                                        @on-enter="sendBarrage"/>
+
+                                <Button type="primary" style="margin-left: 8px;" @click="sendBarrage"
+                                        :disabled="sendDisabled">
+                                    {{sendText}}
+                                </Button>
+                            </div>
                         </div>
+
                     </Card>
                 </div>
             </Content>
@@ -111,6 +116,7 @@
                 seconds:BARRAGE_SEND_INTERVAL,
                 chatroom:null,
                 endTipsShow:false,
+                number:0,   //观看人数
             }
         },
         computed:{
@@ -132,25 +138,27 @@
         },
         methods:{
             getOne:function(){
-                axios.get('/api/live/' + this.liveId).then(res =>{
+                axios.get('/api/live/' + this.liveId).then(res => {
                     if(res.data.errorCode === 0){
-                        this.streamPath = res.data.data.streamPath;
-                        this.title = res.data.data.title;
-                        this.subTitle = res.data.data.subTitle;
-                        this.isReview = res.data.data.isReview;
-                        this.barrageUrl = 'http://source.48.cn' + res.data.data.lrcPath;
-                        this.roomId = res.data.data.roomId;
-                        this.isRadio = res.data.data.liveType == 2;
+                        const data = res.data.data;
+                        this.streamPath = data.streamPath;
+                        this.title = data.title;
+                        this.subTitle = data.subTitle;
+                        this.isReview = data.isReview;
+                        this.barrageUrl = 'http://source.48.cn' + data.lrcPath;
+                        this.roomId = data.roomId;
+                        this.isRadio = data.liveType == 2;
+                        this.number = data.number;
 
-                        this.senderName = Tools.getSenderName() || '超绝可爱' + res.data.data.member.real_name;
+                        this.senderName = Tools.getSenderName() || '超绝可爱' + data.member.real_name;
 
-                        this.pictures = Tools.pictureUrls(res.data.data.picPath);
+                        this.pictures = Tools.pictureUrls(data.picPath);
 
                         this.init();
                     }else{
                         this.$Message.error(res.data.msg);
                     }
-                }).catch(error =>{
+                }).catch(error => {
                     this.spinShow = false;
                     console.log(error);
                 });
@@ -160,13 +168,14 @@
                     const videoElement = document.getElementById('liveVideo');
                     this.flvPlayer = this.$flvjs.createPlayer({
                         type:this.getType(this.streamPath),
-                        url:this.streamPath
+                        url:this.streamPath,
+                        isLive:!this.isReview
                     });
                     this.flvPlayer.attachMediaElement(videoElement);
                     this.flvPlayer.volume = this.$refs.controls.volume * 0.01;
 
                     //当前进度
-                    this.$refs.video.addEventListener('timeupdate', event =>{
+                    this.$refs.video.addEventListener('timeupdate', event => {
                         this.currentTime = event.target.currentTime;
                         //弹幕
                         if(this.isReview){  //录播
@@ -174,7 +183,7 @@
                         }
                     });
                     //播放结束
-                    this.$refs.video.addEventListener('ended', () =>{
+                    this.$refs.video.addEventListener('ended', () => {
                         this.status = STATUS_PREPARED;
                         this.$Notice.info({
                             title:'播放完毕',
@@ -188,11 +197,11 @@
                     if(this.isReview){  //录播
                         this.getBarrages();
                         //时长
-                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.duration = media.duration / 1000;
                         });
                     }else{              //直播
-                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media =>{
+                        this.flvPlayer.on(this.$flvjs.Events.MEDIA_INFO, media => {
                             this.play();
                         });
                         this.connectChatroom();
@@ -204,7 +213,7 @@
                     params:{
                         barrageUrl:this.barrageUrl
                     }
-                }).then(res =>{
+                }).then(res => {
                     if(res.data.errorCode == 0){
                         this.finalBarrageList = this.barrageList = res.data.data.barrages;
                         this.currentBarrage = this.barrageList.shift();
@@ -219,7 +228,7 @@
                             desc:''
                         });
                     }
-                }).catch(error =>{
+                }).catch(error => {
                     this.$Notice.error('弹幕加载失败');
                     console.log(error);
                 });
@@ -253,7 +262,7 @@
                 this.flvPlayer.currentTime = progress;
                 //重新加载弹幕
                 this.barrageList = [];
-                this.finalBarrageList.forEach(item =>{
+                this.finalBarrageList.forEach(item => {
                     if(Tools.timeToSecond(item.time) - 2 > progress){
                         this.barrageList.push(item);
                     }
@@ -296,7 +305,7 @@
                     platform:'android',
                     liveStartTime:'',
                     text:this.content,
-                    senderHonor:';'
+                    senderHonor:';',
 
                 };
                 const message = {
@@ -304,7 +313,7 @@
                     custom:JSON.stringify(custom),
                     type:'text',
                     chatroomId:this.roomId,
-                    done:(error) =>{
+                    done:(error) => {
                         if(error == null){
                             this.$refs.barrage.shoot({
                                 username:this.senderName,
@@ -314,7 +323,7 @@
                         }
                         this.sendDisabled = true;
                         this.content = '';
-                        const timer = setInterval(() =>{
+                        const timer = setInterval(() => {
                             this.sendText = '发送(' + this.seconds + ')';
                             this.seconds--;
                             if(this.seconds == 0){
@@ -335,65 +344,82 @@
             connectChatroom:function(){
                 const options = {
                     roomId:this.roomId,
-                    onConnect:() =>{
+                    onConnect:() => {
                         this.$Notice.success({
                             title:'聊天室连接成功',
                             desc:''
                         });
                     },
-                    onDisconnect:(message) =>{
+                    onDisconnect:(message) => {
                         this.$Notice.success({
                             title:'聊天室连接断开',
                             desc:''
                         });
                         console.log(message);
                     },
-                    onWillConnect:() =>{
+                    onWillConnect:() => {
 
                     },
                     /**
                      * @link https://github.com/Jarvay/48Live/wiki/Chatroom-OnMessage
                      */
-                    onMessage:messages =>{
-                        messages.forEach(message =>{
+                    onMessage:messages => {
+                        messages.forEach(message => {
                             if(message.type == 'text'){
                                 const custom = JSON.parse(message.custom);
-                                let level = custom.isBarrage ? 2 : 1;
-                                if(custom.senderRole == 1){
-                                    level = 2;
-                                }
                                 switch(custom.contentType){
                                     case 1: //弹幕消息
+                                        let level = 1;
+                                        if(custom.senderRole == 1){
+                                            level = 3;
+                                        }else if(custom.isBarrage){
+                                            level = 2;
+                                        }
                                         this.$refs.barrage.shoot({
                                             content:custom.content,
                                             username:custom.senderName,
                                             level:level
                                         });
                                         break;
+                                    case 3: //礼物信息
+                                        this.$refs.barrage.shoot({
+                                            username:custom.senderName,
+                                            content:'送出了' + custom.giftCount + '个' + custom.giftName,
+                                            level:0
+                                        });
+                                        console.log(custom);
+                                        break;
+                                    case 6: //观看人数
+                                        this.number = custom.content.number;
+                                        break;
                                     case 8:
                                         if(custom.content.liveStatus == 2){ //直播结束
                                             this.endShow = true;
                                         }
                                         break;
+                                    default:
+                                        console.log(custom);
+                                        break;
                                 }
+                            }else{
                                 console.log(message);
                             }
                         });
                     },
-                    onError:error =>{
+                    onError:error => {
                         console.log(error);
                     }
                 };
-                Tools.chatroom(options).then(chatroom =>{
+                Tools.chatroom(options).then(chatroom => {
                     this.chatroom = chatroom;
-                }).catch(error =>{
+                }).catch(error => {
                     this.$Notice.success({
                         title:'聊天室token获取失败',
                         desc:''
                     });
                     console.log(error);
                 });
-            }
+            },
         }
     }
 </script>
@@ -401,7 +427,5 @@
 <style scoped>
     .barrage-input-box {
         display: flex;
-        align-items: flex-end;
-        height: 75px;
     }
 </style>
