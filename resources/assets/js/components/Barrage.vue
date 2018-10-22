@@ -56,7 +56,7 @@
                             case 3: //成员弹幕
                                 this.drawQuadratic(barrage.left - BORDER_WIDTH * 4, barrage.top - TEXT_SIZE - BORDER_WIDTH,
                                     this.context.measureText(barrage.username + '：' + barrage.content).width + BORDER_WIDTH * 8,
-                                    80, '#ccc');
+                                    80, '#c07fcc');
                                 this.context.fillStyle = '#fff';
                                 this.context.fillText(barrage.username + '：' + barrage.content, barrage.left, barrage.top);
                                 break;
