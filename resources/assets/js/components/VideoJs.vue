@@ -57,10 +57,10 @@
                 playerOptions:{
                     autoplay:false, // 自动播放
                     controls:false, // 是否显示控制栏
-                    techOrder:[ 'html5', 'flash'], // 兼容顺序
+                    techOrder:['flash', 'html5'], // 兼容顺序
                     sourceOrder:true, //
-                    flash:{hls:{withCredentials:false}},
-                    html5:{hls:{withCredentials:false}},
+                    flash:{hls:{withCredentials:true}},
+                    html5:{hls:{withCredentials:true}},
                     sources:[{
                         withCredentials:false,
                         type:'',
