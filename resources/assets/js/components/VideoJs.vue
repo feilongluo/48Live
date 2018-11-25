@@ -59,8 +59,8 @@
                     controls:false, // 是否显示控制栏
                     techOrder:['flash', 'html5'], // 兼容顺序
                     sourceOrder:true, //
-                    flash:{hls:{withCredentials:true}},
-                    html5:{hls:{withCredentials:true}},
+                    flash:{hls:{withCredentials:false}},
+                    html5:{hls:{withCredentials:false}},
                     sources:[{
                         withCredentials:false,
                         type:'',
