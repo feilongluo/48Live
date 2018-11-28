@@ -21,13 +21,17 @@ require('vue-video-player/src/custom-theme.css');
 import 'videojs-contrib-hls';
 import 'videojs-flash';
 
+
+import 'vue-github-buttons/dist/vue-github-buttons.css';
+import VueGitHubButtons from 'vue-github-buttons';
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-
+Vue.use(VueGitHubButtons, { useCache: true });
 Vue.use(VueRouter);
 Vue.use(iView);
 Vue.use(VueVideoPlayer);

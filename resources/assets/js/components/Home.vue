@@ -3,16 +3,22 @@
         <Spin size="large" fix v-if="spinShow"></Spin>
 
         <Layout>
-            <Header>
-                <Cascader class="cascader" placeholder="请选择成员" :data="members" v-model="selectedMember"></Cascader>
+            <Header class="header">
+                <div>
+                    <Cascader class="cascader" placeholder="请选择成员" :data="members" v-model="selectedMember"></Cascader>
 
-                <span style="margin-left:16px;color:white;">获取条数</span>
+                    <span style="margin-left:16px;color:white;">获取条数</span>
 
-                <Tooltip content="最大值：4800" placement="bottom">
-                    <InputNumber style="margin-left:8px;" :max="4800" :min="1" :step="160" v-model="limit"></InputNumber>
-                </Tooltip>
+                    <Tooltip content="最大值：4800" placement="bottom">
+                        <InputNumber style="margin-left:8px;" :max="4800" :min="1" :step="160" v-model="limit"></InputNumber>
+                    </Tooltip>
 
-                <Button type="primary" @click="getList">搜索</Button>
+                    <Button type="primary" @click="getList">搜索</Button>
+                </div>
+
+                <div>
+                    <gh-btns-star slug="Jarvay/48Live"></gh-btns-star>
+                </div>
             </Header>
             <Content style="padding: 8px 32px;">
                 <Card>
@@ -223,5 +229,15 @@
     .cascader {
         display: inline-flex;
         min-width: 240px;
+    }
+
+    .header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ivu-layout-header{
+        padding: 0 32px;
     }
 </style>
