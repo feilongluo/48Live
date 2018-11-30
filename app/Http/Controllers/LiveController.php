@@ -9,7 +9,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 
-class LiveController extends Controller{
+class LiveController extends Controller
+{
 	const HEADER = [
 		'Content-type' => 'application/json',
 		'version' => '5.0.1',
@@ -22,11 +23,14 @@ class LiveController extends Controller{
 
 	const URL_CHATROOM_TOKEN = 'http://zhibo.ckg48.com/Server/do_ajax_setcookie';
 
+	const PROXY_URL = 'http://live-proxy.jarvay.cn';
+
 	/**
 	 * 获取直播列表
 	 * @return array
 	 */
-	public function list(){
+	public function list()
+	{
 		$body = [
 			'lastTime' => '0',
 			'groupId' => '0',
@@ -84,7 +88,8 @@ class LiveController extends Controller{
 	 * @param $liveId
 	 * @return array
 	 */
-	public function show($liveId){
+	public function show($liveId)
+	{
 		$body = [
 			'type' => '1',
 			'userId' => '0',
@@ -99,11 +104,13 @@ class LiveController extends Controller{
 
 		$data = $result['content'];
 
+		$data['streamPath'] = str_replace('http://alcdn.f01.xiaoka.tv/live/', 'http://live.dev/live/', $data['streamPath']);
+
 		$data['member'] = Member::query()->where('member_id', $data['memberId'])->select([
-				'member_id',
-				'real_name',
-				'team_id'
-			])->first()->toArray();
+			'member_id',
+			'real_name',
+			'team_id'
+		])->first()->toArray();
 		return $this->success($data);
 	}
 
@@ -111,7 +118,8 @@ class LiveController extends Controller{
 	 * 获取弹幕
 	 * @return array
 	 */
-	public function barrage(){
+	public function barrage()
+	{
 		$url = $this->request->barrageUrl;
 		if(!$url){
 			return $this->failed('url不能为空');
@@ -150,7 +158,8 @@ class LiveController extends Controller{
 	 * 获取聊天室token
 	 * @return array
 	 */
-	public function token(){
+	public function token()
+	{
 		$body = [
 			'timestamp' => time(),
 			'cookie_val' => $this->randomString(8),
@@ -183,7 +192,8 @@ class LiveController extends Controller{
 	 * @param int $length
 	 * @return string
 	 */
-	private function randomString($length = 32){
+	private function randomString($length = 32)
+	{
 		$password = str_random($length);
 		return '48web' . $password;
 	}
@@ -194,7 +204,8 @@ class LiveController extends Controller{
 	 * @param $body
 	 * @return bool|Response
 	 */
-	private function send($url, $body){
+	private function send($url, $body)
+	{
 		$request = new Request(self::METHOD_POST, $url, self::HEADER, json_encode($body));
 		$client = new Client();
 		try{
