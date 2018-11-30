@@ -104,7 +104,7 @@ class LiveController extends Controller
 
 		$data = $result['content'];
 
-		$data['streamPath'] = str_replace('http://alcdn.f01.xiaoka.tv/live/', 'http://live.dev/live/', $data['streamPath']);
+		$data['streamPath'] = str_replace('http://alcdn.f01.xiaoka.tv/live/', self::PROXY_URL, $data['streamPath']);
 
 		$data['member'] = Member::query()->where('member_id', $data['memberId'])->select([
 			'member_id',
