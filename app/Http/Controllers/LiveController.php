@@ -23,7 +23,7 @@ class LiveController extends Controller
 
 	const URL_CHATROOM_TOKEN = 'http://zhibo.ckg48.com/Server/do_ajax_setcookie';
 
-	const PROXY_URL = 'http://live-proxy.jarvay.cn';
+	const PROXY_URL = 'http://live-proxy.jarvay.cn/live/';
 
 	/**
 	 * 获取直播列表
